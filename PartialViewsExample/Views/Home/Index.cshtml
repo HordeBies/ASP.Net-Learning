@@ -1,0 +1,11 @@
+﻿<h1>Home</h1>
+
+@{
+    ListModel listModel = new() { ListTitle = "Cities", ListItems = new () { "Paris", "New York", "New Mumbai", "Rome" } };
+}
+
+<div class="box">
+    <partial name="_ListPartialView" model="listModel"></partial>
+</div>
+
+<partial name="_ListPartialView" model="listModel"></partial>

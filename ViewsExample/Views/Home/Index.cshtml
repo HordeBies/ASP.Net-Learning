@@ -1,0 +1,49 @@
+﻿@model IEnumerable<Person>
+@{
+    //var people = (List<Person>?)ViewData["People"]; //use ViewBag to simplify typecasting
+}
+
+@{
+    string alertMessage = $"<script>alert('Person Age: {15}')</script>";
+}
+<!DOCTYPE html>
+<html theme>
+    <head>
+        <title>@ViewData["appTitle"]</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="~/StyleSheet.css" />
+    </head>
+    <body>
+        <div class="page-content">
+
+        <h1>Ali Türk</h1>
+        @*<h2>Hello @person.Name</h2>*@
+    @{
+        //person.Name = "Hasan Deniz";
+    }
+        @*<h2>Hello @person.Name</h2>*@
+        @*Html.Raw(alertMessage)*@
+
+    @foreach (Person p in Model) //dont use var with viewbag
+    {
+        <div class="box float-left w-50">
+            <h3>@p.Name </h3>
+            <table class="table w-100">
+                <tbody>
+                    <tr>
+                        <td class="w-50">Name</td>
+                        <td class="w-50">@p.Name</td>
+                    </tr>
+                    <tr>
+                        <td class="w-50">Age</td>
+                        <td class="w-50">@p.Age</td>
+                    </tr>
+                </tbody>
+            </table>
+            <a href="/persondetails/@p.Name">Details</a>
+        </div>
+    }
+        </div>
+    </body>
+    
+</html>

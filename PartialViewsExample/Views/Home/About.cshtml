@@ -1,0 +1,12 @@
+﻿<h1>About</h1>
+@{
+    ListModel listModel = new() { ListTitle = "Numbers", ListItems = new() { "1", "2", "3", "4", "5" } };
+}
+
+<partial name="_ListPartialView" model="listModel"></partial>
+
+@await Html.PartialAsync("_ListPartialView",listModel)
+
+@{
+    await Html.RenderPartialAsync("_ListPartialView", listModel);
+}
