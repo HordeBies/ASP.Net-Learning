@@ -5,18 +5,8 @@ namespace ViewComponentsExample.ViewComponents
 {
     public class GridViewComponent : ViewComponent
     {
-        async public Task<IViewComponentResult> InvokeAsync()
+        async public Task<IViewComponentResult> InvokeAsync(PersonGridModel model)
         {
-            PersonGridModel model = new PersonGridModel()
-            {
-                GridTitle = "Persons List",
-                Persons = new()
-                {
-                    new Person() {PersonName = "John", JobTitle = "Manager"},
-                    new Person() {PersonName = "Bies", JobTitle = "Asst. Manager"},
-                    new Person() {PersonName = "Lourante", JobTitle = "Kapıcı"},
-                }
-            };
             return View(model); //Views/Shared/Components/Grid/Default.cshtml
         }
     }

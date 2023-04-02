@@ -4,4 +4,19 @@
 
 <h1>About</h1>
 
-<vc:grid></vc:grid>
+@{
+    PersonGridModel personGridModel = new PersonGridModel()
+            {
+                GridTitle = "Friends",
+                People = new()
+                {
+                    new Person() {PersonName = "Hasan Denis", JobTitle = "Köle 1"},
+                    new Person() {PersonName = "Ali Türk", JobTitle = "Köle 2"},
+                    new Person() {PersonName = "Yakürthan", JobTitle = "Köle 3"},
+                }
+            };
+}
+
+@await Component.InvokeAsync("Grid", new {model = personGridModel})
+
+@*<vc:grid model="personGridModel"></vc:grid>*@

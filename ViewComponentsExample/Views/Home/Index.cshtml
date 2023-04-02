@@ -4,4 +4,17 @@
 
 <h1>Home</h1>
 
-@await Component.InvokeAsync("Grid")
+@{
+    PersonGridModel personGridModel = new PersonGridModel()
+            {
+                GridTitle = "People",
+                People = new()
+                {
+                    new Person() {PersonName = "John", JobTitle = "Manager"},
+                    new Person() {PersonName = "Bies", JobTitle = "Asst. Manager"},
+                    new Person() {PersonName = "Lourante", JobTitle = "Kapıcı"},
+                }
+            };
+}
+
+@await Component.InvokeAsync("Grid", new {model = personGridModel})
