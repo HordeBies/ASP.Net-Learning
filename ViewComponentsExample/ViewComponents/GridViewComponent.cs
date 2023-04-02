@@ -17,8 +17,7 @@ namespace ViewComponentsExample.ViewComponents
                     new Person() {PersonName = "Lourante", JobTitle = "Kapıcı"},
                 }
             };
-            ViewData["Grid"] = model;
-            return View(); //Views/Shared/Components/Grid/Default.cshtml
+            return View(model); //Views/Shared/Components/Grid/Default.cshtml
         }
     }
 }
