@@ -5,7 +5,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.Add(new(
     typeof(ICitiesService),
     typeof(CitiesService),
-    ServiceLifetime.Transient));
+    ServiceLifetime.Scoped));
 var app = builder.Build();
 
 app.UseStaticFiles();

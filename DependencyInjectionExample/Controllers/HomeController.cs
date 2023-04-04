@@ -6,15 +6,25 @@ namespace DependencyInjectionExample.Controllers
     public class HomeController : Controller
     {
         private readonly ICitiesService _citiesService;
-        public HomeController(ICitiesService citiesService)
+        private readonly IServiceScopeFactory _scopeFactory;
+        public HomeController(ICitiesService citiesService, IServiceScopeFactory scopeFactory)
         {
             _citiesService = citiesService;
+            _scopeFactory = scopeFactory;
         }
 
         [Route("/")]
         public IActionResult Index()
         {
-            var cities = _citiesService.GetCities();
+            List<string> cities;
+            using(var scope = _scopeFactory.CreateScope())
+            {
+                //Inject CitiesService
+                var citiesService = scope.ServiceProvider.GetService<ICitiesService>();
+                //DB work
+                cities = _citiesService.GetCities();
+                
+            }//end of scope, it calls CitiesService.Dispose
             return View(cities);
         }
     }
