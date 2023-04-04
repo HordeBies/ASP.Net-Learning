@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<string>
+@inject ICitiesService citiesService /* usually a configuration service is injected into a view */
 @{
     ViewBag.Title = "Home";
 }
@@ -9,6 +10,13 @@
 
 <ul class="list">
     @foreach (string city in Model)
+    {
+        <li>@city</li>
+    }
+</ul>
+
+<ul class="list">
+    @foreach (string city in citiesService.GetCities())
     {
         <li>@city</li>
     }
