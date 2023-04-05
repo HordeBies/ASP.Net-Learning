@@ -1,0 +1,5 @@
+dotnet run --no-launch-profile
+
+$Env:ASPNETCORE_ENVIRONMENT="Development"
+or
+set ASPNETCORE_ENVIRONMENT="Development"

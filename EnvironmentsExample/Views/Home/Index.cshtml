@@ -3,3 +3,13 @@
 }
 
 <h1> Home</h1>
+<div class="box">
+    Environment: @ViewBag.CurrentEnvironment
+</div>
+
+<environment include="Development">
+    <button class="button button-blue-back">Show Logs</button>
+</environment>
+<environment exclude="Development">
+    <button class="button button-green-back">Give Feedback</button>
+</environment>
