@@ -12,7 +12,11 @@ namespace ConfigurationExample.Controllers
         [Route("/")]
         public IActionResult Index()
         {
-            ViewBag.MyKey = _configuration["MyKey"];
+            //ViewBag.Key1 = _configuration["weatherapi:clientid"];
+            //ViewBag.Key2 = _configuration["weatherapi:clientsecret"];
+            var weatherapi = _configuration.GetSection("weatherapi");
+            ViewBag.Key1 = weatherapi["clientid"];
+            ViewBag.Key2 = weatherapi["clientsecret"];
             return View();
         }
     }
