@@ -1,0 +1,15 @@
+//Environment
+dotnet run --no-launch-profile
+
+$Env:ASPNETCORE_ENVIRONMENT="Development"
+or
+set ASPNETCORE_ENVIRONMENT="Development"
+
+//Secrets Manager
+dotnet user-secrets init
+dotnet user-secrets set "Key" "Value"
+dotnet user-secrets list
+
+//Environment variables
+$Env:ParentKey__ChildKey="value"
+dotnet run --no-launch-profile
