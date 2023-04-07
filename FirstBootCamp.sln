@@ -43,7 +43,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceContracts", "Service
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EnvironmentsExample", "EnvironmentsExample\EnvironmentsExample.csproj", "{3D0BC959-81FD-472E-9F76-D83B82623744}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationExample", "ConfigurationExample\ConfigurationExample.csproj", "{A71C598D-6EB7-472A-8398-0C8E589FC126}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigurationExample", "ConfigurationExample\ConfigurationExample.csproj", "{A71C598D-6EB7-472A-8398-0C8E589FC126}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
