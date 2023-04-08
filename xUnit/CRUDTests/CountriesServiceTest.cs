@@ -39,7 +39,11 @@ namespace CRUDTests
             {
                 CountryName = "India"
             };
-            Assert.Throws<ArgumentException>(() => countryService.AddCountry(countryAddRequest));
+            Assert.Throws<ArgumentException>(() =>
+            {
+                countryService.AddCountry(countryAddRequest);
+                countryService.AddCountry(countryAddRequest);
+            });
         }
         [Fact]
         public void AddCountry_ValidRequest()
