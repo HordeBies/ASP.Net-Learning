@@ -17,7 +17,7 @@ namespace CRUDTests
         {
             countryService = new CountriesService();
         }
-
+        #region AddCountry
         [Fact]
         public void AddCountry_NullRequest()
         {
@@ -53,9 +53,42 @@ namespace CRUDTests
                 CountryName = "United States"
             };
             var countryResponse = countryService.AddCountry(countryAddRequest);
+            var countries = countryService.GetCountries();
             Assert.NotNull(countryResponse);
             Assert.Equal("United States", countryResponse.CountryName);
             Assert.True(countryResponse.CountryID != Guid.Empty);
+            Assert.Contains(countryResponse, countries);
         }
+        #endregion
+
+        #region GetCountries
+        //unit test for GetCountries
+        [Fact]
+        public void GetCountries_EmptyList()
+        {
+            var actual = countryService.GetCountries();
+            Assert.Empty(actual);
+        }
+        [Fact]
+        public void GetCountries_ReturnedCountries()
+        {
+            var requests = new List<CountryAddRequest>()
+            {
+                new CountryAddRequest() { CountryName = "Romania" },
+                new CountryAddRequest() { CountryName = "France" },
+                new CountryAddRequest () { CountryName = "Germany" }
+            };
+
+            var expected = requests.Select(request => countryService.AddCountry(request)).ToList();
+
+            var actual = countryService.GetCountries();
+
+            Assert.Equal(expected.Count, actual.Count);
+            foreach (var country in expected)
+            {
+                Assert.Contains(country, actual);
+            }
+        }
+        #endregion
     }
 }

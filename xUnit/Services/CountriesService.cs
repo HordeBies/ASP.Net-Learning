@@ -30,5 +30,10 @@ namespace Services
             countries.Add(country);
             return country.ToCountryResponse();
         }
+
+        public List<CountryResponse> GetCountries()
+        {
+            return countries.Select(c=> c.ToCountryResponse()).ToList();
+        }
     }
 }

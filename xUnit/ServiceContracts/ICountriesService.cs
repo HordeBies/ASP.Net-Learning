@@ -1,4 +1,5 @@
-﻿using ServiceContracts.DTO;
+﻿using Entities;
+using ServiceContracts.DTO;
 
 namespace ServiceContracts
 {
@@ -12,6 +13,11 @@ namespace ServiceContracts
         /// </summary>
         /// <param name="request">Country object to add</param>
         /// <returns>Returns the country object after adding it</returns>
-        CountryResponse AddCountry(CountryAddRequest? request);
+        DTO.CountryResponse AddCountry(CountryAddRequest? request);
+        /// <summary>
+        /// Returns the list of all countries
+        /// </summary>
+        /// <returns>All countries from the list as List of CountryResponse</returns>
+        List<CountryResponse> GetCountries();
     }
 }
