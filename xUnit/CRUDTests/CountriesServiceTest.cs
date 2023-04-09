@@ -70,7 +70,7 @@ namespace CRUDTests
             Assert.Empty(actual);
         }
         [Fact]
-        public void GetCountries_ReturnedCountries()
+        public void GetCountries_ValidRequest()
         {
             var requests = new List<CountryAddRequest>()
             {
@@ -88,6 +88,33 @@ namespace CRUDTests
             {
                 Assert.Contains(country, actual);
             }
+        }
+        #endregion
+
+        #region GetCountry
+        [Fact]
+        public void GetCountry_NullCountryID()
+        {
+            var countryResponse = countryService.GetCountry(null);
+            Assert.Null(countryResponse);
+        }
+        [Fact]
+        public void GetCountry_NonExistingCountryID()
+        {
+            var countryResponse = countryService.GetCountry(Guid.NewGuid());
+            Assert.Null(countryResponse);
+        }
+        [Fact]
+        public void GetCountry_ValidRequest()
+        {
+            var request = new CountryAddRequest()
+            {
+                CountryName = "Romania"
+            };
+            var expected = countryService.AddCountry(request);
+            var actual = countryService.GetCountry(expected.CountryID);
+            Assert.NotNull(actual);
+            Assert.Equal(expected, actual);
         }
         #endregion
     }
