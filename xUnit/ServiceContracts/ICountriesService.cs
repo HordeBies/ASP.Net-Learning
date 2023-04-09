@@ -13,18 +13,19 @@ namespace ServiceContracts
         /// </summary>
         /// <param name="request">Country object to add</param>
         /// <returns>Returns the country object after adding it</returns>
-        DTO.CountryResponse AddCountry(CountryAddRequest? request);
+        CountryResponse AddCountry(CountryAddRequest? request);
+
         /// <summary>
         /// Returns the list of all countries
         /// </summary>
-        /// <returns>All countries from the list as List of CountryResponse</returns>
+        /// <returns>All countries from the list as List of <see cref="CountryResponse"/></returns>
         List<CountryResponse> GetCountries();
 
         /// <summary>
         /// Returns a country object based on the countryID
         /// </summary>
         /// <param name="countryID">CountryID (guid) to search</param>
-        /// <returns>Matching country as CountryResponse object</returns>
+        /// <returns>Matching country as <see cref="CountryResponse"/> object</returns>
         public CountryResponse? GetCountry(Guid? countryID);
     }
 }
