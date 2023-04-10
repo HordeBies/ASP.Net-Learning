@@ -14,8 +14,8 @@ namespace CRUDTests
         private readonly ITestOutputHelper testOutputHelper;
         public PersonsServiceTest(ITestOutputHelper testOutputHelper)
         {
-            personsService = new PersonsService();
-            countriesService = new CountriesService();
+            personsService = new PersonsService(false);
+            countriesService = new CountriesService(false);
             this.testOutputHelper = testOutputHelper;
         }
         #region AddPerson

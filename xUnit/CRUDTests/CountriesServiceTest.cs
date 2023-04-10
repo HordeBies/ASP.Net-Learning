@@ -15,7 +15,7 @@ namespace CRUDTests
         private readonly ICountriesService countryService;
         public CountriesServiceTest()
         {
-            countryService = new CountriesService();
+            countryService = new CountriesService(false);
         }
         #region AddCountry
         [Fact]
