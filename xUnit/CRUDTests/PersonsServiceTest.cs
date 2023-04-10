@@ -86,5 +86,59 @@ namespace CRUDTests
             Assert.Equal(expected, actual);
         }
         #endregion
+
+        #region GetPersons
+        [Fact]
+        public void GetPersons_EmptyCollection()
+        {
+            var expected = personsService.GetPersons();
+            Assert.Empty(expected);
+        }
+        [Fact]
+        public void GetPersons_ValidCollection()
+        {
+            var countryAddRequests = new List<CountryAddRequest>
+            {
+                new()
+                {
+                    CountryName = "United States"
+                },
+                new()
+                {
+                    CountryName = "India"
+                }
+            };
+            var countries = countryAddRequests.Select(c => countriesService.AddCountry(c)).ToList();
+            var personAddRequests = new List<PersonAddRequest>
+            {
+                new()
+                {
+                    PersonName = "person1",
+                    Email = "mail1@google.com",
+                    CountryID = countries[0].CountryID,
+                },
+                new()
+                {
+                    PersonName ="person2",
+                    Email = "mail2@google.com",
+                    CountryID = countries[1].CountryID,
+                },
+                new()
+                {
+                    PersonName ="person3",
+                    Email = "mail3@google.com",
+                    CountryID = countries[0].CountryID
+                }
+            };
+
+            var expected = personAddRequests.Select(p => personsService.AddPerson(p)).ToList();
+            var actual = personsService.GetPersons();
+            Assert.Equal(expected.Count, actual.Count);
+            foreach (var person in expected)
+            {
+                Assert.Contains(person, actual);
+            }
+        }
+        #endregion
     }
 }
