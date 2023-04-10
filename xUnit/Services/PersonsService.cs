@@ -116,5 +116,13 @@ namespace Services
             persons.Add(person);
             return person.ToPersonResponse();
         }
+
+        public bool DeletePerson(Guid? PersonID)
+        {
+            if (PersonID == null || PersonID == Guid.Empty) return false;
+            var person = persons.FirstOrDefault(p => p.PersonID == PersonID);
+            if (person == null) return false;
+            return persons.Remove(person);
+        }
     }
 }

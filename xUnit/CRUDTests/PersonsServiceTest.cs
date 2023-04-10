@@ -387,5 +387,40 @@ namespace CRUDTests
             Assert.Equal(expected,actual);
         }
         #endregion
+
+        #region DeletePerson
+        [Fact]
+        public void DeletePerson_NonExistentID()
+        {
+            Guid nonExistentID = Guid.NewGuid();
+
+            bool result = personsService.DeletePerson(nonExistentID);
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void DeletePerson_ValidID_ReturnsTrue()
+        {
+            var personAddRequest = new PersonAddRequest
+            {
+                PersonName = "John",
+                Email = "test@test.com",
+                Address = "sample address",
+                DateOfBirth = new DateTime(2000, 6, 12),
+                Gender = GenderOptions.Other,
+                ReceieveNewsLetters = true,
+                CountryID = null,
+            };
+            var addedPerson = personsService.AddPerson(personAddRequest);
+
+            bool result = personsService.DeletePerson(addedPerson.PersonID);
+
+            var expected = personsService.GetPerson(addedPerson.PersonID);
+
+            Assert.True(result);
+            Assert.Null(expected);
+        }
+        #endregion
     }
 }
