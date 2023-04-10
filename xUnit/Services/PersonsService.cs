@@ -104,5 +104,17 @@ namespace Services
             };
             return sorted;
         }
+
+        public PersonResponse UpdatePerson(PersonUpdateRequest? request)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            ValidationHelper.ModelValidation(request);
+            var match = persons.FirstOrDefault(p => p.PersonID == request.PersonID);
+            if (match == null) throw new ArgumentException("Given person does not exist");
+            persons.Remove(match); //TODO: update in here instead of replacing it
+            var person = request.ToPerson();
+            persons.Add(person);
+            return person.ToPersonResponse();
+        }
     }
 }

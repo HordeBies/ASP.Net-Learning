@@ -325,5 +325,67 @@ namespace CRUDTests
             }
         }
         #endregion
+
+        #region UpdatePerson
+        [Fact]
+        public void UpdatePerson_NullRequest()
+        {
+            PersonUpdateRequest? request = null;
+            Assert.Throws<ArgumentNullException>(() => personsService.UpdatePerson(request));
+        }
+        [Fact]
+        public void UpdatePerson_InvalidPersonID()
+        {
+            var request = new PersonUpdateRequest
+            {
+                PersonID = Guid.NewGuid(), // Invalid person ID
+                PersonName = "John Smith",
+                Email = "john.smith@example.com",
+                Address = "123 Main St",
+                DateOfBirth = new DateTime(1980, 1, 1),
+                Gender = GenderOptions.Male,
+                ReceieveNewsLetters = true
+            };
+
+            Assert.Throws<ArgumentException>(() => personsService.UpdatePerson(request));
+        }
+        [Fact]
+        public void UpdatePerson_NullPersonName()
+        {
+            var person = personsService.AddPerson(new PersonAddRequest
+            {
+                PersonName = "John Smith",
+                Email = "john.smith@example.com",
+                Address = "123 Main St",
+                DateOfBirth = new DateTime(1980, 1, 1),
+                Gender = GenderOptions.Male,
+            });
+            var request = person.ToPersonUpdateRequest();
+            request.PersonName = null;
+
+            Assert.Throws<ArgumentException>(() => personsService.UpdatePerson(request));
+        }
+        [Fact]
+        public void UpdatePerson_ValidPersonID()
+        {
+            var person = personsService.AddPerson(new PersonAddRequest
+            {
+                PersonName = "John Smith",
+                Email = "john.smith@example.com",
+                Address = "123 Main St",
+                DateOfBirth = new DateTime(1980, 1, 1),
+                Gender = GenderOptions.Male,
+            });
+
+            var request = person.ToPersonUpdateRequest();
+            request.PersonName = "Mehmet Demirci";
+            request.Email = "oa.mehmetdmrc@gmail.com";
+
+            var expected = personsService.UpdatePerson(request);
+            var actual = personsService.GetPerson(request.PersonID);
+
+            Assert.Equal(expected,actual);
+        }
+        #endregion
     }
 }

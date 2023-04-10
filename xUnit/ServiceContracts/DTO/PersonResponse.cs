@@ -24,6 +24,21 @@ namespace ServiceContracts.DTO
         public bool ReceiveNewsLetters { get; set; }
         public double? Age { get; set; }
 
+        public PersonUpdateRequest ToPersonUpdateRequest()
+        {
+            return new()
+            {
+                PersonID = PersonID,
+                PersonName = PersonName,
+                Email = Email,
+                DateOfBirth = DateOfBirth,
+                Gender = string.IsNullOrEmpty(Gender) ? GenderOptions.Other : Enum.Parse<GenderOptions>(Gender,true),
+                CountryID = CountryID,
+                Address = Address,
+                ReceieveNewsLetters = ReceiveNewsLetters,
+            };
+        }
+
         public override bool Equals(object? obj)
         {
             if (obj == null) return false;

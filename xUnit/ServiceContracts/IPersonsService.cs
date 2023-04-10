@@ -48,5 +48,12 @@ namespace ServiceContracts
         /// <param name="sortOrder">The sort order to use (ascending or descending).</param>
         /// <returns>A sorted List of PersonResponse objects.</returns>
         public List<PersonResponse> GetSortedPersons(List<PersonResponse> collectiong, string sortby, Enums.SortOrder sortOrder);
+
+        /// <summary>
+        /// Updates an existing person with the specified changes.
+        /// </summary>
+        /// <param name="request">The request object that contains the person's updated information.</param>
+        /// <returns>A response object that contains the updated person's information.</returns>
+        public PersonResponse UpdatePerson(PersonUpdateRequest? request);
     }
 }
