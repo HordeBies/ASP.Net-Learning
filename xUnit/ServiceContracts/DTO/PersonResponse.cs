@@ -45,6 +45,21 @@ namespace ServiceContracts.DTO
         {
             return base.GetHashCode();
         }
+        public override string ToString()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine("PersonID: " + PersonID);
+            stringBuilder.AppendLine("PersonName: " + PersonName);
+            stringBuilder.AppendLine("Email: " + Email);
+            stringBuilder.AppendLine("DateOfBirth: " + DateOfBirth);
+            stringBuilder.AppendLine("Gender: " + Gender);
+            stringBuilder.AppendLine("CountryID: " + CountryID);
+            stringBuilder.AppendLine("Country: " + Country);
+            stringBuilder.AppendLine("Address: " + Address);
+            stringBuilder.AppendLine("ReceiveNewsLetters: " + ReceiveNewsLetters);
+            stringBuilder.AppendLine("Age: " + Age);
+            return stringBuilder.ToString();
+        }
     }
     public static class PersonResponseExtensions
     {
