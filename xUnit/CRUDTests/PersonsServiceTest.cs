@@ -44,7 +44,7 @@ namespace CRUDTests
                 CountryID = Guid.NewGuid(),
                 Gender = GenderOptions.Male,
                 DateOfBirth = new(2000,1,1),
-                ReceieveNewsLetters = true
+                ReceiveNewsLetters = true
             };
             var expected = personsService.AddPerson(personAddRequest);
             var collection = personsService.GetPersons();
@@ -81,7 +81,7 @@ namespace CRUDTests
                 Address = "sample address",
                 DateOfBirth = new(2000,6,12),
                 Gender = GenderOptions.Other,
-                ReceieveNewsLetters = true,
+                ReceiveNewsLetters = true,
                 CountryID = countryResponse.CountryID,
             };
             var expected = personsService.AddPerson(personAddRequest);
@@ -409,7 +409,7 @@ namespace CRUDTests
                 Address = "sample address",
                 DateOfBirth = new DateTime(2000, 6, 12),
                 Gender = GenderOptions.Other,
-                ReceieveNewsLetters = true,
+                ReceiveNewsLetters = true,
                 CountryID = null,
             };
             var addedPerson = personsService.AddPerson(personAddRequest);
