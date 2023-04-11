@@ -2,34 +2,84 @@
 @{
     ViewBag.Title = "Persons";
 }
-<h1>Persons</h1>
 
-<table class="table w-100 mt">
-    <thead>
-        <tr>
-            <th>Person Name</th>
-            <th>Email</th>
-            <th>Date of Birth</th>
-            <th>Age</th>
-            <th>Gender</th>
-            <th>Country</th>
-            <th>Address</th>
-            <th>Receive News Letters</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (PersonResponse person in Model)
-        {
+<form action="~/persons/index" method="get">
+
+    <h1>Persons</h1>
+
+    <div class="box flex">
+        <div class="flex-1">
+            <select class="form-input" name="searchBy">
+                @foreach (KeyValuePair<string, string> field in ViewBag.SearchFields)
+                {
+                    if (field.Key == ViewBag.searchBy)
+                    {
+                        <option value="@field.Key" selected="selected">@field.Value</option>
+                    }
+                    <option value="@field.Key">@field.Value</option>
+                }
+            </select>
+        </div>
+        <div class="flex-1">
+            <input type="search" id="Search" class="form-input" name="searchString" placeholder="Search" value="@ViewBag.searchString" />
+        </div>
+        <div class="flex-1">
+            <button class="button button-blue-back">Search</button>
+            <a href="~/persons/index" class="link-hover">Clear All</a>
+        </div>
+    </div>
+
+    <table class="table w-100 mt">
+        <thead>
             <tr>
-                <td>@person.PersonName</td>
-                <td>@person.Email</td>
-                <td>@person.DateOfBirth?.ToString("d")</td>
-                <td>@person.Age</td>
-                <td>@person.Gender</td>
-                <td>@person.Country</td>
-                <td>@person.Address</td>
-                <td>@person.ReceiveNewsLetters</td>
+                @await Html.PartialAsync("_GridColumnHeader", new(ViewData){
+                {"ColumnName", nameof(PersonResponse.PersonName)},
+                {"DisplayName", "Person Name"}
+                })
+                @await Html.PartialAsync("_GridColumnHeader", new(ViewData){
+                {"ColumnName", nameof(PersonResponse.Email)},
+                {"DisplayName", "Email"}
+                })
+                @await Html.PartialAsync("_GridColumnHeader", new(ViewData){
+                {"ColumnName", nameof(PersonResponse.DateOfBirth)},
+                {"DisplayName", "Date of Birth"}
+                })
+                @await Html.PartialAsync("_GridColumnHeader", new(ViewData){
+                {"ColumnName", nameof(PersonResponse.Age)},
+                {"DisplayName", "Age"}
+                })
+                @await Html.PartialAsync("_GridColumnHeader", new(ViewData){
+                {"ColumnName", nameof(PersonResponse.Gender)},
+                {"DisplayName", "Gender"}
+                })
+                @await Html.PartialAsync("_GridColumnHeader", new(ViewData){
+                {"ColumnName", nameof(PersonResponse.Country)},
+                {"DisplayName", "Country"}
+                })
+                @await Html.PartialAsync("_GridColumnHeader", new(ViewData){
+                {"ColumnName", nameof(PersonResponse.Address)},
+                {"DisplayName", "Address"}
+                })
+                @await Html.PartialAsync("_GridColumnHeader", new(ViewData){
+                {"ColumnName", nameof(PersonResponse.ReceiveNewsLetters)},
+                {"DisplayName", "Receive News Letters"}
+                })
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (PersonResponse person in Model)
+            {
+                <tr>
+                    <td class="w-15">@person.PersonName</td>
+                    <td class="w-20">@person.Email</td>
+                    <td class="w-10">@person.DateOfBirth?.ToString("d")</td>
+                    <td class="w-5">@person.Age</td>
+                    <td class="w-10">@person.Gender</td>
+                    <td class="w-10">@person.Country</td>
+                    <td class="w-10">@person.Address</td>
+                    <td class="w-20">@person.ReceiveNewsLetters</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</form>
