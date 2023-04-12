@@ -35,7 +35,7 @@ namespace ServiceContracts.DTO
                 Gender = string.IsNullOrEmpty(Gender) ? GenderOptions.Other : Enum.Parse<GenderOptions>(Gender,true),
                 CountryID = CountryID,
                 Address = Address,
-                ReceieveNewsLetters = ReceiveNewsLetters,
+                ReceiveNewsLetters = ReceiveNewsLetters,
             };
         }
 

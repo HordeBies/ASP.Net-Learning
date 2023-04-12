@@ -344,7 +344,7 @@ namespace CRUDTests
                 Address = "123 Main St",
                 DateOfBirth = new DateTime(1980, 1, 1),
                 Gender = GenderOptions.Male,
-                ReceieveNewsLetters = true
+                ReceiveNewsLetters = true
             };
 
             Assert.Throws<ArgumentException>(() => personsService.UpdatePerson(request));
