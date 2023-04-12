@@ -77,5 +77,25 @@ namespace CRUDExample.Controllers
             personsService.UpdatePerson(person);
             return RedirectToAction("Index", "Persons");
         }
+
+        [HttpGet]
+        [Route("[action]/{PersonID}")]
+        public IActionResult Delete(Guid PersonID)
+        {
+            var person = personsService.GetPerson(PersonID);
+            if(person == null)
+                return RedirectToAction("Index");
+            return View(person);
+        }
+
+        [HttpPost]
+        [Route("[action]/{PersonID}")]
+        public IActionResult Delete(PersonResponse person)
+        {
+            var success = personsService.DeletePerson(person.PersonID);
+            TempData["MessageType"] = success ? "Deleted" : "PersonNotFound";
+            TempData["MessageText"] = success ? "Successfully deleted " + person.PersonName : "Could not found " + person.PersonName;
+            return RedirectToAction("Index");
+        }
     }
 }

@@ -80,7 +80,7 @@
                     <td class="w-10">@person.Country</td>
                     <td class="w-10">@person.Address</td>
                     <td class="w-15">@person.ReceiveNewsLetters</td>
-                    <td class="w-10"><a asp-controller="Persons" asp-action="Edit" asp-route-PersonID="@person.PersonID">Update</a></td>
+                    <td class="w-10"><a asp-controller="Persons" asp-action="Edit" asp-route-PersonID="@person.PersonID">Edit</a> <a class="ml" asp-controller="Persons" asp-action="Delete" asp-route-PersonID="@person.PersonID">Delete</a></td>
                 </tr>
             }
         </tbody>
