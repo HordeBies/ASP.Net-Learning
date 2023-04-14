@@ -14,8 +14,8 @@ namespace Entities
         public PersonsDbContext(DbContextOptions options) : base(options)
         {
         }
-        public DbSet<Person> Persons;
-        public DbSet<Country> Countries;
+        public DbSet<Person> Persons { get; set; }
+        public DbSet<Country> Countries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -6,10 +6,10 @@ namespace Services
 {
     public class CountriesService : ICountriesService
     {
-        private readonly List<Country> countries;
-        public CountriesService()
+        private readonly PersonsDbContext db;
+        public CountriesService(PersonsDbContext personsDbContext)
         {
-            countries = new List<Country>();
+            db = personsDbContext;
         }
         public CountryResponse AddCountry(CountryAddRequest? request)
         {
@@ -21,18 +21,20 @@ namespace Services
             {
                 throw new ArgumentException("Country name is null or empty");
             }
-            if(countries.Any(c=> c.CountryName == request.CountryName))
+            if(db.Countries.Any(c=> c.CountryName == request.CountryName))
             {
                 throw new ArgumentException("Country name already exists");
             }
             var country = request.ToCountry(); 
             country.CountryID = Guid.NewGuid();
-            countries.Add(country);
+            db.Countries.Add(country);
+            db.SaveChanges();
             return country.ToCountryResponse();
         }
 
         public List<CountryResponse> GetCountries()
         {
+            var countries = db.Countries.ToList();
             return countries.Select(c=> c.ToCountryResponse()).ToList();
         }
 
@@ -40,8 +42,7 @@ namespace Services
         {
             if (countryID == null)
                 return null;
-
-            return countries.FirstOrDefault(c => c.CountryID == countryID)?.ToCountryResponse();
+            return db.Countries.FirstOrDefault(c => c.CountryID == countryID)?.ToCountryResponse();
         }
     }
 }

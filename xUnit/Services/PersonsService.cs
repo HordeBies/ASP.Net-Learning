@@ -9,12 +9,12 @@ namespace Services
 {
     public class PersonsService : IPersonsService
     {
-        private List<Person> persons;
+        private PersonsDbContext db;
         private ICountriesService countriesService;
-        public PersonsService()
+        public PersonsService(PersonsDbContext personsDbContext, ICountriesService countriesService)
         {
-            persons = new List<Person>();
-            countriesService = new CountriesService();
+            db = personsDbContext;
+            this.countriesService = countriesService; 
         }
 
         private PersonResponse ConvertPersonToPersonResponse(Person person)
@@ -32,20 +32,22 @@ namespace Services
 
             var person = request.ToPerson();
             person.PersonID = Guid.NewGuid();
-            persons.Add(person);
+            db.Persons.Add(person);
+            db.SaveChanges();
 
             return ConvertPersonToPersonResponse(person);
         }
 
         public List<PersonResponse> GetPersons()
         {
+            var persons = db.Persons.ToList();
             return persons.Select(p => ConvertPersonToPersonResponse(p)).ToList();
         }
 
         public PersonResponse? GetPerson(Guid? PersonID)
         {
             if (PersonID == null) return null;
-            var person = persons.FirstOrDefault(p => p.PersonID == PersonID);
+            var person = db.Persons.FirstOrDefault(p => p.PersonID == PersonID);
             if (person == null) return null;
             return ConvertPersonToPersonResponse(person);
         }
@@ -112,20 +114,27 @@ namespace Services
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             ValidationHelper.ModelValidation(request);
-            var match = persons.FirstOrDefault(p => p.PersonID == request.PersonID);
+            var match = db.Persons.FirstOrDefault(p => p.PersonID == request.PersonID);
             if (match == null) throw new ArgumentException("Given person does not exist");
-            persons.Remove(match); //TODO: update in here instead of replacing it
-            var person = request.ToPerson();
-            persons.Add(person);
-            return person.ToPersonResponse();
+            match.PersonName = request.PersonName;
+            match.Address = request.Address;
+            match.CountryID = request.CountryID;
+            match.DateOfBirth = request.DateOfBirth;
+            match.Email = request.Email;
+            match.Gender = request.Gender.ToString();
+            match.ReceiveNewsLetters = request.ReceiveNewsLetters;
+            db.SaveChanges();
+            return match.ToPersonResponse();
         }
 
         public bool DeletePerson(Guid? PersonID)
         {
             if (PersonID == null || PersonID == Guid.Empty) return false;
-            var person = persons.FirstOrDefault(p => p.PersonID == PersonID);
+            var person = db.Persons.FirstOrDefault(p => p.PersonID == PersonID);
             if (person == null) return false;
-            return persons.Remove(person);
+            db.Remove(person);
+            db.SaveChanges();
+            return true;
         }
     }
 }
