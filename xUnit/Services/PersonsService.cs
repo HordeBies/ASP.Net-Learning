@@ -32,16 +32,16 @@ namespace Services
 
             var person = request.ToPerson();
             person.PersonID = Guid.NewGuid();
-            //db.Persons.Add(person);
-            //db.SaveChanges();
-            db.sp_InsertPerson(person);
+            db.Persons.Add(person);
+            db.SaveChanges();
+            //db.sp_InsertPerson(person);
 
             return ConvertPersonToPersonResponse(person);
         }
 
         public List<PersonResponse> GetPersons()
         {
-            return db.sp_GetAllPersons().Select(p => ConvertPersonToPersonResponse(p)).ToList();
+            return db.Persons.ToList().Select(p => ConvertPersonToPersonResponse(p)).ToList();
         }
 
         public PersonResponse? GetPerson(Guid? PersonID)

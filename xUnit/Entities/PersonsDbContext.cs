@@ -39,6 +39,16 @@ namespace Entities
             {
                 modelBuilder.Entity<Person>().HasData(person);
             }
+
+            //Fluent API
+            modelBuilder.Entity<Person>().Property(c => c.TIN)
+                .HasColumnName("TaxIdentificationNumber")
+                .HasColumnType("varchar(8)")
+                .HasDefaultValue("ABC12345");
+
+            //modelBuilder.Entity<Person>().HasIndex(t => t.TIN).IsUnique();
+            //modelBuilder.Entity<Person>().HasCheckConstraint("CHK_TIN", "len([TaxIdentificationNumber]) = 8");
+            modelBuilder.Entity<Person>().ToTable(t=> t.HasCheckConstraint("CHK_TIN", "len([TaxIdentificationNumber]) = 8"));
         }
 
         public List<Person> sp_GetAllPersons()
