@@ -4,6 +4,8 @@ using Services;
 using ServiceContracts.Enums;
 using System.Text;
 using Xunit.Abstractions;
+using Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CRUDTests
 {
@@ -14,8 +16,8 @@ namespace CRUDTests
         private readonly ITestOutputHelper testOutputHelper;
         public PersonsServiceTest(ITestOutputHelper testOutputHelper)
         {
-            personsService = new PersonsService();
-            countriesService = new CountriesService();
+            countriesService = new CountriesService(new PersonsDbContext(new DbContextOptionsBuilder<PersonsDbContext>().Options));
+            personsService = new PersonsService(new PersonsDbContext(new DbContextOptionsBuilder<PersonsDbContext>().Options),countriesService);
             this.testOutputHelper = testOutputHelper;
         }
         #region AddPerson
