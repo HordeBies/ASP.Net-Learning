@@ -11,79 +11,10 @@ namespace Services
     {
         private List<Person> persons;
         private ICountriesService countriesService;
-        public PersonsService(bool initialize = true)
+        public PersonsService()
         {
             persons = new List<Person>();
             countriesService = new CountriesService();
-            if (initialize)
-            {
-                persons.Add(new Person
-                {
-                    PersonID = Guid.Parse("B763140E-FE26-495C-BF65-45FFEDB0076D"),
-                    PersonName = "Chan Millery",
-                    Email = "cmillery0@marriott.com",
-                    DateOfBirth = new(1994,9,25),
-                    Gender = "Male",
-                    Address = "03 Mitchell Pass",
-                    ReceiveNewsLetters = true,
-                    CountryID = Guid.Parse("AC1556E1-1811-4294-8049-D6C2352D2E73")
-                });
-                persons.Add(new Person
-                {
-                    PersonID = Guid.Parse("13D06051-2935-4B43-A750-32C81E4A7AF8"),
-                    PersonName = "Euell Pelchat",
-                    Email = "epelchat1@newsvine.com",
-                    DateOfBirth = new(1957,2, 7),
-                    Gender = "Male",
-                    Address = "5 Myrtle Way",
-                    ReceiveNewsLetters = true,
-                    CountryID = Guid.Parse("16F464AD-65D2-4E82-BD51-BDE0FEE91BB8")
-                });
-                persons.Add(new Person
-                {
-                    PersonID = Guid.Parse("5A854D38-D965-4586-9007-E30C500C395A"),
-                    PersonName = "Thaxter Tomaselli",
-                    Email = "ttomaselli2@networksolutions.com",
-                    DateOfBirth = new(1969,7,14),
-                    Gender = "Other",
-                    Address = "28 Daystar Court",
-                    ReceiveNewsLetters = false,
-                    CountryID = Guid.Parse("7DB3A34C-5B12-4558-93D2-997318B0E95A")
-                });
-                persons.Add(new Person
-                {
-                    PersonID = Guid.Parse("5C0D783F-C967-4BB3-95A9-CE51213C38F9"),
-                    PersonName = "Washington Lindfors",
-                    Email = "wlindfors3@creativecommons.org",
-                    DateOfBirth = new(1989,6,17),
-                    Gender = "Male",
-                    Address = "55520 Acker Street",
-                    ReceiveNewsLetters = false,
-                    CountryID = Guid.Parse("E839C350-555B-4847-A3A2-43517D543FC6")
-                });
-                persons.Add(new Person
-                {
-                    PersonID = Guid.Parse("A7C07FD9-89AE-4E6E-A351-10EFAC7853EA"),
-                    PersonName = "Wilhelmine Trett",
-                    Email = "wtrett4@blogspot.com",
-                    DateOfBirth = new(1989,9,4),
-                    Gender = "Female",
-                    Address = "14 Center Court",
-                    ReceiveNewsLetters = true,
-                    CountryID = Guid.Parse("2A638819-BEC1-4EEC-81EE-D864CEE07C46")
-                });
-                persons.Add(new Person
-                {
-                    PersonID = Guid.Parse("F9DCCC2A-64A2-4280-9C98-F38F12B1EED4"),
-                    PersonName = "Roze Bushby",
-                    Email = "rbushby5@dyndns.org",
-                    DateOfBirth = new(1967,8,31),
-                    Gender = "Female",
-                    Address = "81 Barnett Court",
-                    ReceiveNewsLetters = false,
-                    CountryID = Guid.Parse("7DB3A34C-5B12-4558-93D2-997318B0E95A")
-                });
-            }
         }
 
         private PersonResponse ConvertPersonToPersonResponse(Person person)
