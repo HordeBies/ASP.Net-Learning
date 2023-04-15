@@ -20,41 +20,41 @@ namespace CRUDTests
         }
         #region AddCountry
         [Fact]
-        public void AddCountry_NullRequest()
+        public async Task AddCountry_NullRequest()
         {
-            Assert.Throws<ArgumentNullException>(() => countryService.AddCountry(null));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await countryService.AddCountry(null));
         }
         [Fact]
-        public void AddCountry_NullCountryName()
+        public async Task AddCountry_NullCountryName()
         {
             var countryAddRequest = new CountryAddRequest
             {
                 CountryName = null
             };
-            Assert.Throws<ArgumentException>(() => countryService.AddCountry(countryAddRequest));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await countryService.AddCountry(countryAddRequest));
         }
         [Fact]
-        public void AddCountry_DuplicateCountryName()
+        public async Task AddCountry_DuplicateCountryName()
         {
             var countryAddRequest = new CountryAddRequest
             {
                 CountryName = "India"
             };
-            Assert.Throws<ArgumentException>(() =>
+            await Assert.ThrowsAsync<ArgumentException>(async() =>
             {
-                countryService.AddCountry(countryAddRequest);
-                countryService.AddCountry(countryAddRequest);
+                await countryService.AddCountry(countryAddRequest);
+                await countryService.AddCountry(countryAddRequest);
             });
         }
         [Fact]
-        public void AddCountry_ValidRequest()
+        public async Task AddCountry_ValidRequest()
         {
             var countryAddRequest = new CountryAddRequest
             {
                 CountryName = "United States"
             };
-            var countryResponse = countryService.AddCountry(countryAddRequest);
-            var countries = countryService.GetCountries();
+            var countryResponse = await countryService.AddCountry(countryAddRequest);
+            var countries = await countryService.GetCountries();
             Assert.NotNull(countryResponse);
             Assert.Equal("United States", countryResponse.CountryName);
             Assert.True(countryResponse.CountryID != Guid.Empty);
@@ -65,13 +65,13 @@ namespace CRUDTests
         #region GetCountries
         //unit test for GetCountries
         [Fact]
-        public void GetCountries_EmptyList()
+        public async Task GetCountries_EmptyList()
         {
-            var actual = countryService.GetCountries();
+            var actual = await countryService.GetCountries();
             Assert.Empty(actual);
         }
         [Fact]
-        public void GetCountries_ValidRequest()
+        public async Task GetCountries_ValidRequest()
         {
             var requests = new List<CountryAddRequest>()
             {
@@ -80,11 +80,15 @@ namespace CRUDTests
                 new CountryAddRequest () { CountryName = "Germany" }
             };
 
-            var expected = requests.Select(request => countryService.AddCountry(request)).ToList();
+            var expected = await Task.WhenAll(requests.Select(async request => await countryService.AddCountry(request)));
+            //List<CountryResponse> expected = new();
+            //foreach (var request in requests)
+            //{
+            //    expected.Add(await countryService.AddCountry(request));
+            //}
+            var actual = await countryService.GetCountries();
 
-            var actual = countryService.GetCountries();
-
-            Assert.Equal(expected.Count, actual.Count);
+            Assert.Equal(expected.Length, actual.Count);
             foreach (var country in expected)
             {
                 Assert.Contains(country, actual);
@@ -94,26 +98,26 @@ namespace CRUDTests
 
         #region GetCountry
         [Fact]
-        public void GetCountry_NullCountryID()
+        public async Task GetCountry_NullCountryID()
         {
-            var countryResponse = countryService.GetCountry(null);
+            var countryResponse = await countryService.GetCountry(null);
             Assert.Null(countryResponse);
         }
         [Fact]
-        public void GetCountry_NonExistingCountryID()
+        public async Task GetCountry_NonExistingCountryID()
         {
-            var countryResponse = countryService.GetCountry(Guid.NewGuid());
+            var countryResponse = await countryService.GetCountry(Guid.NewGuid());
             Assert.Null(countryResponse);
         }
         [Fact]
-        public void GetCountry_ValidRequest()
+        public async Task GetCountry_ValidRequest()
         {
             var request = new CountryAddRequest()
             {
                 CountryName = "Romania"
             };
-            var expected = countryService.AddCountry(request);
-            var actual = countryService.GetCountry(expected.CountryID);
+            var expected = await countryService.AddCountry(request);
+            var actual = await countryService.GetCountry(expected.CountryID);
             Assert.NotNull(actual);
             Assert.Equal(expected, actual);
         }
