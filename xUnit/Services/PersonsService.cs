@@ -1,4 +1,5 @@
 ﻿using Entities;
+using Microsoft.EntityFrameworkCore;
 using ServiceContracts;
 using ServiceContracts.DTO;
 using ServiceContracts.Enums;
@@ -17,13 +18,6 @@ namespace Services
             this.countriesService = countriesService; 
         }
 
-        private PersonResponse ConvertPersonToPersonResponse(Person person)
-        {
-            var response = person.ToPersonResponse();
-            response.Country = countriesService.GetCountry(response.CountryID)?.CountryName;
-            return response;
-        }
-
         public PersonResponse AddPerson(PersonAddRequest? request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
@@ -36,20 +30,21 @@ namespace Services
             db.SaveChanges();
             //db.sp_InsertPerson(person);
 
-            return ConvertPersonToPersonResponse(person);
+            return person.ToPersonResponse();
         }
 
         public List<PersonResponse> GetPersons()
         {
-            return db.Persons.ToList().Select(p => ConvertPersonToPersonResponse(p)).ToList();
+            var persons = db.Persons.Include(nameof(Person.Country)).ToList();
+            return persons.Select(p => p.ToPersonResponse()).ToList();
         }
 
         public PersonResponse? GetPerson(Guid? PersonID)
         {
             if (PersonID == null) return null;
-            var person = db.Persons.FirstOrDefault(p => p.PersonID == PersonID);
+            var person = db.Persons.Include(nameof(Person.Country)).FirstOrDefault(p => p.PersonID == PersonID);
             if (person == null) return null;
-            return ConvertPersonToPersonResponse(person);
+            return person.ToPersonResponse();
         }
 
         public List<PersonResponse> GetFilteredPersons(string searchby, string? searchString)
