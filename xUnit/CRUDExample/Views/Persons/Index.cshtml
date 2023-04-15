@@ -8,6 +8,9 @@
     <h1>Persons</h1>
 
     <a asp-controller="Persons" asp-action="Create">Create Person</a>
+    <a asp-controller="Persons" asp-action="PersonsPDF">Download as PDF</a>
+    <a asp-controller="Persons" asp-action="PersonsCSV">Download as CSV</a>
+    <a asp-controller="Persons" asp-action="PersonsExcel">Download as Excel</a>
     <div class="box flex">
         <div class="flex-1">
             <select class="form-input" name="searchBy">
@@ -74,7 +77,7 @@
                 <tr>
                     <td class="w-10">@person.PersonName</td>
                     <td class="w-15">@person.Email</td>
-                    <td class="w-10">@person.DateOfBirth?.ToString("d")</td>
+                    <td class="w-10">@person.DateOfBirth?.ToString("dd MMM yyyy")</td>
                     <td class="w-5">@person.Age</td>
                     <td class="w-10">@person.Gender</td>
                     <td class="w-10">@person.Country</td>

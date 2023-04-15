@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Rotativa.AspNetCore;
 using ServiceContracts;
 using ServiceContracts.DTO;
 using ServiceContracts.Enums;
@@ -96,6 +97,31 @@ namespace CRUDExample.Controllers
             //TempData["MessageType"] = success ? "Deleted" : "PersonNotFound";
             //TempData["MessageText"] = success ? "Successfully deleted " + person.PersonName : "Could not found " + person.PersonName;
             return RedirectToAction("Index");
+        }
+
+        [Route("[action]")]
+        public async Task<IActionResult> PersonsPDF()
+        {
+            var persons = await personsService.GetPersons();
+            return new ViewAsPdf("PersonsPDF", persons, ViewData)
+            {
+                PageMargins = new(20,20,20,20),
+                PageOrientation = Rotativa.AspNetCore.Options.Orientation.Landscape,
+                PageSize = Rotativa.AspNetCore.Options.Size.A4,
+            };
+        }
+
+        [Route("[action]")]
+        public async Task<IActionResult> PersonsCSV()
+        {
+            var stream = await personsService.GetPersonsCSV();
+            return File(stream, "application/octet-stream","persons.csv");
+        }
+        [Route("[action]")]
+        public async Task<IActionResult> PersonsExcel()
+        {
+            var stream = await personsService.GetPersonsExcel();
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "persons.xlsx");
         }
     }
 }
