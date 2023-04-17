@@ -14,8 +14,8 @@ namespace Services
 {
     public class PersonsService : IPersonsService
     {
-        private PersonsDbContext db;
-        public PersonsService(PersonsDbContext personsDbContext)
+        private ApplicationDbContext db;
+        public PersonsService(ApplicationDbContext personsDbContext)
         {
             db = personsDbContext;
         }
