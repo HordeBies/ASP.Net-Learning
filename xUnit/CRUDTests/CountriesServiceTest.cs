@@ -10,14 +10,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoFixture;
 
 namespace CRUDTests
 {
     public class CountriesServiceTest
     {
         private readonly ICountriesService countryService;
+        private readonly IFixture fixture;
         public CountriesServiceTest()
         {
+            fixture = new Fixture();
             var countries = new List<Country>();
             var dbContextMock = new DbContextMock<ApplicationDbContext>(new DbContextOptionsBuilder<ApplicationDbContext>().Options);
             var dbContext = dbContextMock.Object;
@@ -33,19 +36,13 @@ namespace CRUDTests
         [Fact]
         public async Task AddCountry_NullCountryName()
         {
-            var countryAddRequest = new CountryAddRequest
-            {
-                CountryName = null
-            };
+            var countryAddRequest = fixture.Build<CountryAddRequest>().With(r => r.CountryName, null as string).Create();
             await Assert.ThrowsAsync<ArgumentException>(async () => await countryService.AddCountry(countryAddRequest));
         }
         [Fact]
         public async Task AddCountry_DuplicateCountryName()
         {
-            var countryAddRequest = new CountryAddRequest
-            {
-                CountryName = "India"
-            };
+            var countryAddRequest = fixture.Create<CountryAddRequest>();
             await Assert.ThrowsAsync<ArgumentException>(async() =>
             {
                 await countryService.AddCountry(countryAddRequest);
@@ -55,10 +52,7 @@ namespace CRUDTests
         [Fact]
         public async Task AddCountry_ValidRequest()
         {
-            var countryAddRequest = new CountryAddRequest
-            {
-                CountryName = "United States"
-            };
+            var countryAddRequest = fixture.Create<CountryAddRequest>();
             var countryResponse = await countryService.AddCountry(countryAddRequest);
             var countries = await countryService.GetCountries();
             Assert.NotNull(countryResponse);
@@ -79,12 +73,7 @@ namespace CRUDTests
         [Fact]
         public async Task GetCountries_ValidRequest()
         {
-            var requests = new List<CountryAddRequest>()
-            {
-                new CountryAddRequest() { CountryName = "Romania" },
-                new CountryAddRequest() { CountryName = "France" },
-                new CountryAddRequest () { CountryName = "Germany" }
-            };
+            var requests = fixture.CreateMany<CountryAddRequest>(3);
 
             var expected = await Task.WhenAll(requests.Select(async request => await countryService.AddCountry(request)));
             //List<CountryResponse> expected = new();
@@ -118,10 +107,7 @@ namespace CRUDTests
         [Fact]
         public async Task GetCountry_ValidRequest()
         {
-            var request = new CountryAddRequest()
-            {
-                CountryName = "Romania"
-            };
+            var request = fixture.Create<CountryAddRequest>();
             var expected = await countryService.AddCountry(request);
             var actual = await countryService.GetCountry(expected.CountryID);
             Assert.NotNull(actual);

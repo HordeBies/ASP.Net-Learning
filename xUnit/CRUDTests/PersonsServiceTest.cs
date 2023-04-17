@@ -7,6 +7,7 @@ using Xunit.Abstractions;
 using Entities;
 using Microsoft.EntityFrameworkCore;
 using EntityFrameworkCoreMock;
+using AutoFixture;
 
 namespace CRUDTests
 {
@@ -15,8 +16,11 @@ namespace CRUDTests
         private readonly IPersonsService personsService;
         private readonly ICountriesService countriesService;
         private readonly ITestOutputHelper testOutputHelper;
+        private readonly IFixture fixture;
         public PersonsServiceTest(ITestOutputHelper testOutputHelper)
         {
+            this.testOutputHelper = testOutputHelper;
+            fixture = new Fixture();
             var countries = new List<Country>();
             var persons = new List<Person>();
             var dbContextMock = new DbContextMock<ApplicationDbContext>(new DbContextOptionsBuilder<ApplicationDbContext>().Options);
@@ -25,7 +29,6 @@ namespace CRUDTests
             dbContextMock.CreateDbSetMock(x => x.Persons, persons);
             countriesService = new CountriesService(dbContext);
             personsService = new PersonsService(dbContext);
-            this.testOutputHelper = testOutputHelper;
         }
         #region AddPerson
         [Fact]
@@ -36,25 +39,17 @@ namespace CRUDTests
         [Fact]
         public async Task AddPerson_NullPersonName()
         {
-            var personAddRequest = new PersonAddRequest
-            {
-                PersonName = null
-            };
+            var personAddRequest = fixture.Build<PersonAddRequest>()
+                .With(r => r.PersonName, null as string)
+                .Create();
             await Assert.ThrowsAsync<ArgumentException>(async () => await personsService.AddPerson(personAddRequest));
         }
         [Fact]
         public async Task AddPerson_ValidRequest()
         {
-            var personAddRequest = new PersonAddRequest
-            {
-                PersonName = "John",
-                Address = "sample address",
-                Email = "john@bies.com",
-                CountryID = Guid.NewGuid(),
-                Gender = GenderOptions.Male,
-                DateOfBirth = new(2000, 1, 1),
-                ReceiveNewsLetters = true
-            };
+            var personAddRequest = fixture.Build<PersonAddRequest>()
+                .With(r => r.Email, "test@example.com")
+                .Create();
             var expected = await personsService.AddPerson(personAddRequest);
             var collection = await personsService.GetPersons();
             Assert.True(expected.PersonID != Guid.Empty);
@@ -78,27 +73,29 @@ namespace CRUDTests
         [Fact]
         public async Task GetPerson_ValidPersonID()
         {
-            var countryAddRequest = new CountryAddRequest
-            {
-                CountryName = "United States"
-            };
+            var countryAddRequest = fixture.Create<CountryAddRequest>();
             var countryResponse = await countriesService.AddCountry(countryAddRequest);
-            var personAddRequest = new PersonAddRequest
-            {
-                PersonName = "John",
-                Email = "test@test.com",
-                Address = "sample address",
-                DateOfBirth = new(2000, 6, 12),
-                Gender = GenderOptions.Other,
-                ReceiveNewsLetters = true,
-                CountryID = countryResponse.CountryID,
-            };
+            var personAddRequest = fixture.Build<PersonAddRequest>()
+                .With(r => r.CountryID, countryResponse.CountryID)
+                .With(r => r.Email, "test@example.com")
+                .Create();
             var expected = await personsService.AddPerson(personAddRequest);
             var actual = await personsService.GetPerson(expected.PersonID);
             Assert.Equal(expected, actual);
         }
         #endregion
-
+        private async Task<PersonResponse[]> CreatePersons()
+        {
+            var countryAddRequests = fixture.CreateMany<CountryAddRequest>(3);
+            var countries = await Task.WhenAll(countryAddRequests.Select(async request => await countriesService.AddCountry(request)));
+            var personAddRequests = new List<PersonAddRequest>
+            {
+                fixture.Build<PersonAddRequest>().With(r => r.Email, "email1@google.com").With(r => r.CountryID, countries[2].CountryID).With(r => r.PersonName, "Hasan Deniz").Create(),
+                fixture.Build<PersonAddRequest>().With(r => r.Email, "email2@google.com").With(r => r.CountryID, countries[0].CountryID).Create(),
+                fixture.Build<PersonAddRequest>().With(r => r.Email, "email3@google.com").With(r => r.CountryID, countries[1].CountryID).With(r => r.PersonName, "Hayri Türk").Create(),
+            };
+            return await Task.WhenAll(personAddRequests.Select(async request => await personsService.AddPerson(request)));
+        }
         #region GetPersons
         [Fact]
         public async Task GetPersons_EmptyCollection()
@@ -109,24 +106,8 @@ namespace CRUDTests
         [Fact]
         public async Task GetPersons_ValidCollection()
         {
-            var countryAddRequests = new List<CountryAddRequest>
-            {
-                new()
-                {
-                    CountryName = "United States"
-                },
-                new()
-                {
-                    CountryName = "India"
-                }
-            };
-            var countries = await Task.WhenAll(countryAddRequests.Select(async request => await countriesService.AddCountry(request)));
-            var personAddRequests = new List<PersonAddRequest>
-            {
-                new() { PersonName = "person1", Email = "mail1@google.com", CountryID = countries[0].CountryID, Gender = GenderOptions.Male } , new() { PersonName = "person2", Email = "mail2@google.com", CountryID = countries[1].CountryID, Gender = GenderOptions.Female } , new() { PersonName = "person3", Email = "mail3@google.com", CountryID = countries[0].CountryID, Gender = GenderOptions.Other }
-            };
+            var expected = await CreatePersons();
 
-            var expected = await Task.WhenAll(personAddRequests.Select(async request => await personsService.AddPerson(request)));
             var actual = await personsService.GetPersons();
             testOutputHelper.WriteLine("Expected:");
             foreach (var item in expected)
@@ -151,44 +132,8 @@ namespace CRUDTests
         [Fact]
         public async Task GetFilteredPersons_EmptySearchText()
         {
-            var countryAddRequests = new List<CountryAddRequest>
-            {
-                new()
-                {
-                    CountryName = "United States"
-                },
-                new()
-                {
-                    CountryName = "India"
-                }
-            };
-            var countries = await Task.WhenAll(countryAddRequests.Select(async request => await countriesService.AddCountry(request)));
-            var personAddRequests = new List<PersonAddRequest>
-            {
-                new()
-                {
-                    PersonName = "person1",
-                    Email = "mail1@google.com",
-                    CountryID = countries[0].CountryID,
-                    Gender = GenderOptions.Male
-                },
-                new()
-                {
-                    PersonName ="person2",
-                    Email = "mail2@google.com",
-                    CountryID = countries[1].CountryID,
-                    Gender = GenderOptions.Female
-                },
-                new()
-                {
-                    PersonName ="person3",
-                    Email = "mail3@google.com",
-                    CountryID = countries[0].CountryID,
-                    Gender = GenderOptions.Other
-                }
-            };
+            var expected = await CreatePersons();
 
-            var expected = await Task.WhenAll(personAddRequests.Select(async request => await personsService.AddPerson(request)));
             var actual = await personsService.GetFilteredPersons(nameof(PersonResponse.PersonName), "");
             testOutputHelper.WriteLine("Expected:");
             foreach (var item in expected)
@@ -209,44 +154,8 @@ namespace CRUDTests
         [Fact]
         public async Task GetFilteredPersons_ValidSearch()
         {
-            var countryAddRequests = new List<CountryAddRequest>
-            {
-                new()
-                {
-                    CountryName = "United States"
-                },
-                new()
-                {
-                    CountryName = "India"
-                }
-            };
-            var countries = await Task.WhenAll(countryAddRequests.Select(async request => await countriesService.AddCountry(request)));
-            var personAddRequests = new List<PersonAddRequest>
-            {
-                new()
-                {
-                    PersonName = "Hasan",
-                    Email = "mail1@google.com",
-                    CountryID = countries[0].CountryID,
-                    Gender = GenderOptions.Male
-                },
-                new()
-                {
-                    PersonName ="Mehmet",
-                    Email = "mail2@google.com",
-                    CountryID = countries[1].CountryID,
-                    Gender = GenderOptions.Female
-                },
-                new()
-                {
-                    PersonName ="Hayri",
-                    Email = "mail3@google.com",
-                    CountryID = countries[0].CountryID,
-                    Gender = GenderOptions.Other
-                }
-            };
+            var expected = await CreatePersons();
 
-            var expected = await Task.WhenAll(personAddRequests.Select(async request => await personsService.AddPerson(request)));
             var actual = await personsService.GetFilteredPersons(nameof(PersonResponse.PersonName), "ha");
             testOutputHelper.WriteLine("Expected:");
             foreach (var item in expected)
@@ -270,24 +179,8 @@ namespace CRUDTests
         [Fact]
         public async Task GetSortedPersons_ValidSort()
         {
-            var countryAddRequests = new List<CountryAddRequest>
-            {
-                new()
-                {
-                    CountryName = "United States"
-                },
-                new()
-                {
-                    CountryName = "India"
-                }
-            };
-            var countries = await Task.WhenAll(countryAddRequests.Select(async request => await countriesService.AddCountry(request)));
-            var personAddRequests = new List<PersonAddRequest>
-            {
-                new() { PersonName = "Hasan", Email = "mail1@google.com", CountryID = countries[0].CountryID, Gender = GenderOptions.Male } , new() { PersonName = "Mehmet", Email = "mail2@google.com", CountryID = countries[1].CountryID, Gender = GenderOptions.Female } , new() { PersonName = "Hayri", Email = "mail3@google.com", CountryID = countries[0].CountryID, Gender = GenderOptions.Other }
-            };
+            var query = await CreatePersons();
 
-            var query = await Task.WhenAll(personAddRequests.Select(async request => await personsService.AddPerson(request)));
             var actual = await personsService.GetSortedPersons(await personsService.GetPersons(), nameof(PersonResponse.PersonName), SortOrder.Descending);
             var expected = new List<PersonResponse>(query).OrderByDescending(i => i.PersonName).ToList();
             testOutputHelper.WriteLine("Expected:");
@@ -317,48 +210,30 @@ namespace CRUDTests
         [Fact]
         public async Task UpdatePerson_InvalidPersonID()
         {
-            var request = new PersonUpdateRequest
-            {
-                PersonID = Guid.NewGuid(), // Invalid person ID
-                PersonName = "John Smith",
-                Email = "john.smith@example.com",
-                Address = "123 Main St",
-                DateOfBirth = new DateTime(1980, 1, 1),
-                Gender = GenderOptions.Male,
-                ReceiveNewsLetters = true
-            };
+            var request = fixture.Build<PersonUpdateRequest>()
+                .With(r => r.Email, "test@example.com")
+                .With(r => r.PersonID, Guid.NewGuid())
+                .Create();
 
             await Assert.ThrowsAsync<ArgumentException>(async () => await personsService.UpdatePerson(request));
         }
         [Fact]
         public async Task UpdatePerson_NullPersonName()
         {
-            var person = await personsService.AddPerson(new PersonAddRequest
-            {
-                PersonName = "John Smith",
-                Email = "john.smith@example.com",
-                Address = "123 Main St",
-                DateOfBirth = new DateTime(1980, 1, 1),
-                Gender = GenderOptions.Male,
-            });
-            var request = person.ToPersonUpdateRequest();
-            request.PersonName = null;
+            var personAddRequest = fixture.Build<PersonAddRequest>().With(r => r.Email, "test@example.com").Create();
+            var personResponse = await personsService.AddPerson(personAddRequest);
+            var personUpdateRequest = personResponse.ToPersonUpdateRequest();
+            personUpdateRequest.PersonName = null;
 
-            await Assert.ThrowsAsync<ArgumentException>(async () => await personsService.UpdatePerson(request));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await personsService.UpdatePerson(personUpdateRequest));
         }
         [Fact]
         public async Task UpdatePerson_ValidPersonID()
         {
-            var person = await personsService.AddPerson(new PersonAddRequest
-            {
-                PersonName = "John Smith",
-                Email = "john.smith@example.com",
-                Address = "123 Main St",
-                DateOfBirth = new DateTime(1980, 1, 1),
-                Gender = GenderOptions.Male,
-            });
+            var personAddRequest = fixture.Build<PersonAddRequest>().With(r => r.Email, "test@example.com").Create();
+            var personResponse = await personsService.AddPerson(personAddRequest);
 
-            var request = person.ToPersonUpdateRequest();
+            var request = personResponse.ToPersonUpdateRequest();
             request.PersonName = "Mehmet Demirci";
             request.Email = "oa.mehmetdmrc@gmail.com";
 
@@ -381,23 +256,14 @@ namespace CRUDTests
         }
 
         [Fact]
-        public async Task DeletePerson_ValidID_ReturnsTrue()
+        public async Task DeletePerson_ValidID()
         {
-            var personAddRequest = new PersonAddRequest
-            {
-                PersonName = "John",
-                Email = "test@test.com",
-                Address = "sample address",
-                DateOfBirth = new DateTime(2000, 6, 12),
-                Gender = GenderOptions.Other,
-                ReceiveNewsLetters = true,
-                CountryID = null,
-            };
-            var addedPerson = await personsService.AddPerson(personAddRequest);
+            var personAddRequest = fixture.Build<PersonAddRequest>().With(r => r.Email, "test@example.com").Create();
+            var personResponse = await personsService.AddPerson(personAddRequest);
 
-            bool result = await personsService.DeletePerson(addedPerson.PersonID);
+            bool result = await personsService.DeletePerson(personResponse.PersonID);
 
-            var expected = await personsService.GetPerson(addedPerson.PersonID);
+            var expected = await personsService.GetPerson(personResponse.PersonID);
 
             Assert.True(result);
             Assert.Null(expected);
