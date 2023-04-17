@@ -2,12 +2,12 @@ using ServiceContracts;
 using ServiceContracts.DTO;
 using Services;
 using ServiceContracts.Enums;
-using System.Text;
 using Xunit.Abstractions;
 using Entities;
 using Microsoft.EntityFrameworkCore;
 using EntityFrameworkCoreMock;
 using AutoFixture;
+using FluentAssertions;
 
 namespace CRUDTests
 {
@@ -34,7 +34,8 @@ namespace CRUDTests
         [Fact]
         public async Task AddPerson_NullRequest()
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await personsService.AddPerson(null));
+            var action = (async () => await personsService.AddPerson(null));
+            await action.Should().ThrowAsync<ArgumentNullException>();
         }
         [Fact]
         public async Task AddPerson_NullPersonName()
@@ -42,7 +43,8 @@ namespace CRUDTests
             var personAddRequest = fixture.Build<PersonAddRequest>()
                 .With(r => r.PersonName, null as string)
                 .Create();
-            await Assert.ThrowsAsync<ArgumentException>(async () => await personsService.AddPerson(personAddRequest));
+            var action = (async () => await personsService.AddPerson(personAddRequest));
+            await action.Should().ThrowAsync<ArgumentException>();
         }
         [Fact]
         public async Task AddPerson_ValidRequest()
@@ -52,8 +54,10 @@ namespace CRUDTests
                 .Create();
             var expected = await personsService.AddPerson(personAddRequest);
             var collection = await personsService.GetPersons();
-            Assert.True(expected.PersonID != Guid.Empty);
-            Assert.Contains(expected, collection);
+
+            expected.Should().NotBeNull();
+            expected.PersonID.Should().NotBe(Guid.Empty);
+            collection.Should().Contain(expected);
         }
         #endregion
 
@@ -62,13 +66,13 @@ namespace CRUDTests
         public async Task GetPerson_NullPersonID()
         {
             var expected = await personsService.GetPerson(null);
-            Assert.Null(expected);
+            expected.Should().BeNull();
         }
         [Fact]
         public async Task GetPerson_InvalidPersonID()
         {
             var expected = await personsService.GetPerson(Guid.NewGuid());
-            Assert.Null(expected);
+            expected.Should().BeNull();
         }
         [Fact]
         public async Task GetPerson_ValidPersonID()
@@ -81,7 +85,7 @@ namespace CRUDTests
                 .Create();
             var expected = await personsService.AddPerson(personAddRequest);
             var actual = await personsService.GetPerson(expected.PersonID);
-            Assert.Equal(expected, actual);
+            actual.Should().Be(expected);
         }
         #endregion
         private async Task<PersonResponse[]> CreatePersons()
@@ -101,7 +105,7 @@ namespace CRUDTests
         public async Task GetPersons_EmptyCollection()
         {
             var expected = await personsService.GetPersons();
-            Assert.Empty(expected);
+            expected.Should().BeEmpty();
         }
         [Fact]
         public async Task GetPersons_ValidCollection()
@@ -119,11 +123,8 @@ namespace CRUDTests
             {
                 testOutputHelper.WriteLine(item.ToString());
             }
-            Assert.Equal(expected.Length, actual.Count);
-            foreach (var person in expected)
-            {
-                Assert.Contains(person, actual);
-            }
+
+            actual.Should().BeEquivalentTo(expected);
         }
         #endregion
 
@@ -145,11 +146,8 @@ namespace CRUDTests
             {
                 testOutputHelper.WriteLine(item.ToString());
             }
-            Assert.Equal(expected.Length, actual.Count);
-            foreach (var person in expected)
-            {
-                Assert.Contains(person, actual);
-            }
+
+            actual.Should().BeEquivalentTo(expected);
         }
         [Fact]
         public async Task GetFilteredPersons_ValidSearch()
@@ -172,6 +170,8 @@ namespace CRUDTests
                 if (person.PersonName != null && person.PersonName.Contains("ha", StringComparison.OrdinalIgnoreCase))
                     Assert.Contains(person, actual);
             }
+
+            actual.Should().OnlyContain(expected => expected.PersonName!.Contains("ha",StringComparison.OrdinalIgnoreCase));
         }
         #endregion
 
@@ -179,10 +179,9 @@ namespace CRUDTests
         [Fact]
         public async Task GetSortedPersons_ValidSort()
         {
-            var query = await CreatePersons();
+            var expected = await CreatePersons();
 
             var actual = await personsService.GetSortedPersons(await personsService.GetPersons(), nameof(PersonResponse.PersonName), SortOrder.Descending);
-            var expected = new List<PersonResponse>(query).OrderByDescending(i => i.PersonName).ToList();
             testOutputHelper.WriteLine("Expected:");
             foreach (var item in expected)
             {
@@ -193,10 +192,8 @@ namespace CRUDTests
             {
                 testOutputHelper.WriteLine(item.ToString());
             }
-            for (int idx = 0; idx < expected.Count; idx++)
-            {
-                Assert.Equal(expected[idx], actual[idx]);
-            }
+            
+            actual.Should().BeInDescendingOrder(expected => expected.PersonName);
         }
         #endregion
 
@@ -205,7 +202,8 @@ namespace CRUDTests
         public async Task UpdatePerson_NullRequest()
         {
             PersonUpdateRequest? request = null;
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await personsService.UpdatePerson(request));
+            var action = (async () => await personsService.UpdatePerson(request));
+            await action.Should().ThrowAsync<ArgumentNullException>();
         }
         [Fact]
         public async Task UpdatePerson_InvalidPersonID()
@@ -214,8 +212,8 @@ namespace CRUDTests
                 .With(r => r.Email, "test@example.com")
                 .With(r => r.PersonID, Guid.NewGuid())
                 .Create();
-
-            await Assert.ThrowsAsync<ArgumentException>(async () => await personsService.UpdatePerson(request));
+            var action = (async () => await personsService.UpdatePerson(request));
+            await action.Should().ThrowAsync<ArgumentException>();
         }
         [Fact]
         public async Task UpdatePerson_NullPersonName()
@@ -225,7 +223,8 @@ namespace CRUDTests
             var personUpdateRequest = personResponse.ToPersonUpdateRequest();
             personUpdateRequest.PersonName = null;
 
-            await Assert.ThrowsAsync<ArgumentException>(async () => await personsService.UpdatePerson(personUpdateRequest));
+            var action = (async () => await personsService.UpdatePerson(personUpdateRequest));
+            await action.Should().ThrowAsync<ArgumentException>();
         }
         [Fact]
         public async Task UpdatePerson_ValidPersonID()
@@ -240,7 +239,7 @@ namespace CRUDTests
             var expected = await personsService.UpdatePerson(request);
             var actual = await personsService.GetPerson(request.PersonID);
 
-            Assert.Equal(expected, actual);
+            actual.Should().Be(expected);
         }
         #endregion
 
@@ -252,7 +251,7 @@ namespace CRUDTests
 
             bool result = await personsService.DeletePerson(nonExistentID);
 
-            Assert.False(result);
+            result.Should().BeFalse();
         }
 
         [Fact]
@@ -265,8 +264,8 @@ namespace CRUDTests
 
             var expected = await personsService.GetPerson(personResponse.PersonID);
 
-            Assert.True(result);
-            Assert.Null(expected);
+            result.Should().BeTrue();
+            expected.Should().BeNull();
         }
         #endregion
     }

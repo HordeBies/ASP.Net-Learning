@@ -4,13 +4,8 @@ using ServiceContracts;
 using ServiceContracts.DTO;
 using Services;
 using EntityFrameworkCoreMock;
-using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AutoFixture;
+using FluentAssertions;
 
 namespace CRUDTests
 {
@@ -31,23 +26,26 @@ namespace CRUDTests
         [Fact]
         public async Task AddCountry_NullRequest()
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await countryService.AddCountry(null));
+            var action = (async () => await countryService.AddCountry(null));
+            await action.Should().ThrowAsync<ArgumentNullException>();
         }
         [Fact]
         public async Task AddCountry_NullCountryName()
         {
             var countryAddRequest = fixture.Build<CountryAddRequest>().With(r => r.CountryName, null as string).Create();
-            await Assert.ThrowsAsync<ArgumentException>(async () => await countryService.AddCountry(countryAddRequest));
+            var action = (async () => await countryService.AddCountry(countryAddRequest));
+            await action.Should().ThrowAsync<ArgumentException>();
         }
         [Fact]
         public async Task AddCountry_DuplicateCountryName()
         {
             var countryAddRequest = fixture.Create<CountryAddRequest>();
-            await Assert.ThrowsAsync<ArgumentException>(async() =>
+            var action = (async () =>
             {
                 await countryService.AddCountry(countryAddRequest);
                 await countryService.AddCountry(countryAddRequest);
             });
+            await action.Should().ThrowAsync<ArgumentException>();
         }
         [Fact]
         public async Task AddCountry_ValidRequest()
@@ -55,10 +53,10 @@ namespace CRUDTests
             var countryAddRequest = fixture.Create<CountryAddRequest>();
             var countryResponse = await countryService.AddCountry(countryAddRequest);
             var countries = await countryService.GetCountries();
-            Assert.NotNull(countryResponse);
-            Assert.Equal("United States", countryResponse.CountryName);
-            Assert.True(countryResponse.CountryID != Guid.Empty);
-            Assert.Contains(countryResponse, countries);
+            countries.Should().NotBeNull();
+            countryResponse.CountryName.Should().Be(countryAddRequest.CountryName);
+            countryResponse.CountryID.Should().NotBeEmpty();
+            countries.Should().Contain(countryResponse);
         }
         #endregion
 
@@ -68,7 +66,7 @@ namespace CRUDTests
         public async Task GetCountries_EmptyList()
         {
             var actual = await countryService.GetCountries();
-            Assert.Empty(actual);
+            actual.Should().BeEmpty();
         }
         [Fact]
         public async Task GetCountries_ValidRequest()
@@ -83,11 +81,7 @@ namespace CRUDTests
             //}
             var actual = await countryService.GetCountries();
 
-            Assert.Equal(expected.Length, actual.Count);
-            foreach (var country in expected)
-            {
-                Assert.Contains(country, actual);
-            }
+            actual.Should().BeEquivalentTo(expected);
         }
         #endregion
 
@@ -96,13 +90,13 @@ namespace CRUDTests
         public async Task GetCountry_NullCountryID()
         {
             var countryResponse = await countryService.GetCountry(null);
-            Assert.Null(countryResponse);
+            countryResponse.Should().BeNull();
         }
         [Fact]
         public async Task GetCountry_NonExistingCountryID()
         {
             var countryResponse = await countryService.GetCountry(Guid.NewGuid());
-            Assert.Null(countryResponse);
+            countryResponse.Should().BeNull();
         }
         [Fact]
         public async Task GetCountry_ValidRequest()
@@ -110,8 +104,8 @@ namespace CRUDTests
             var request = fixture.Create<CountryAddRequest>();
             var expected = await countryService.AddCountry(request);
             var actual = await countryService.GetCountry(expected.CountryID);
-            Assert.NotNull(actual);
-            Assert.Equal(expected, actual);
+            actual.Should().NotBeNull();
+            actual.Should().BeEquivalentTo(expected);
         }
         #endregion
     }
