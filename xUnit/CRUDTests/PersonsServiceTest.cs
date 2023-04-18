@@ -27,8 +27,8 @@ namespace CRUDTests
             var dbContext = dbContextMock.Object;
             dbContextMock.CreateDbSetMock(x => x.Countries, countries);
             dbContextMock.CreateDbSetMock(x => x.Persons, persons);
-            countriesService = new CountriesService(dbContext);
-            personsService = new PersonsService(dbContext);
+            countriesService = new CountriesService(null);
+            personsService = new PersonsService(null);
         }
         #region AddPerson
         [Fact]
