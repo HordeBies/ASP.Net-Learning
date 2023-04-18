@@ -53,7 +53,7 @@ namespace CRUDTests
                 .With(r => r.Email, "test@example.com")
                 .Create();
             var expected = await personsService.AddPerson(personAddRequest);
-            var collection = await personsService.GetPersons();
+            var collection = await personsService.GetAllPersons();
 
             expected.Should().NotBeNull();
             expected.PersonID.Should().NotBe(Guid.Empty);
@@ -100,19 +100,19 @@ namespace CRUDTests
             };
             return await Task.WhenAll(personAddRequests.Select(async request => await personsService.AddPerson(request)));
         }
-        #region GetPersons
+        #region GetAllPersons
         [Fact]
-        public async Task GetPersons_EmptyCollection()
+        public async Task GetAllPersons_EmptyCollection()
         {
-            var expected = await personsService.GetPersons();
+            var expected = await personsService.GetAllPersons();
             expected.Should().BeEmpty();
         }
         [Fact]
-        public async Task GetPersons_ValidCollection()
+        public async Task GetAllPersons_ValidCollection()
         {
             var expected = await CreatePersons();
 
-            var actual = await personsService.GetPersons();
+            var actual = await personsService.GetAllPersons();
             testOutputHelper.WriteLine("Expected:");
             foreach (var item in expected)
             {
@@ -181,7 +181,7 @@ namespace CRUDTests
         {
             var expected = await CreatePersons();
 
-            var actual = await personsService.GetSortedPersons(await personsService.GetPersons(), nameof(PersonResponse.PersonName), SortOrder.Descending);
+            var actual = await personsService.GetSortedPersons(await personsService.GetAllPersons(), nameof(PersonResponse.PersonName), SortOrder.Descending);
             testOutputHelper.WriteLine("Expected:");
             foreach (var item in expected)
             {

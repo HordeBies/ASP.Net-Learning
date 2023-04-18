@@ -20,7 +20,7 @@ namespace ServiceContracts
         /// Returns the list of all countries
         /// </summary>
         /// <returns>All countries from the list as List of <see cref="CountryResponse"/></returns>
-        Task<List<CountryResponse>> GetCountries();
+        Task<List<CountryResponse>> GetAllCountries();
 
         /// <summary>
         /// Returns a country object based on the countryID

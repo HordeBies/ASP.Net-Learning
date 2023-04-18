@@ -52,7 +52,7 @@ namespace CRUDTests
         {
             var countryAddRequest = fixture.Create<CountryAddRequest>();
             var countryResponse = await countryService.AddCountry(countryAddRequest);
-            var countries = await countryService.GetCountries();
+            var countries = await countryService.GetAllCountries();
             countries.Should().NotBeNull();
             countryResponse.CountryName.Should().Be(countryAddRequest.CountryName);
             countryResponse.CountryID.Should().NotBeEmpty();
@@ -60,16 +60,16 @@ namespace CRUDTests
         }
         #endregion
 
-        #region GetCountries
-        //unit test for GetCountries
+        #region GetAllCountries
+        //unit test for GetAllCountries
         [Fact]
-        public async Task GetCountries_EmptyList()
+        public async Task GetAllCountries_EmptyList()
         {
-            var actual = await countryService.GetCountries();
+            var actual = await countryService.GetAllCountries();
             actual.Should().BeEmpty();
         }
         [Fact]
-        public async Task GetCountries_ValidRequest()
+        public async Task GetAllCountries_ValidRequest()
         {
             var requests = fixture.CreateMany<CountryAddRequest>(3);
 
@@ -79,7 +79,7 @@ namespace CRUDTests
             //{
             //    expected.Add(await countryService.AddCountry(request));
             //}
-            var actual = await countryService.GetCountries();
+            var actual = await countryService.GetAllCountries();
 
             actual.Should().BeEquivalentTo(expected);
         }

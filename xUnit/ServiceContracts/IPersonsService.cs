@@ -23,7 +23,7 @@ namespace ServiceContracts
         /// Retrieves a list of all people.
         /// </summary>
         /// <returns>A list of person objects.</returns>
-        Task<List<PersonResponse>> GetPersons();
+        Task<List<PersonResponse>> GetAllPersons();
 
         /// <summary>
         /// Retrieves a person object with the specified ID.

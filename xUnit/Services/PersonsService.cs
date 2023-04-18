@@ -35,7 +35,7 @@ namespace Services
             return person.ToPersonResponse();
         }
 
-        public async Task<List<PersonResponse>> GetPersons()
+        public async Task<List<PersonResponse>> GetAllPersons()
         {
             var persons = await db.Persons.Include(nameof(Person.Country)).ToListAsync();
             return persons.Select(p => p.ToPersonResponse()).ToList();
@@ -51,7 +51,7 @@ namespace Services
 
         public async Task<List<PersonResponse>> GetFilteredPersons(string searchby, string? searchString)
         {
-            var allPersons = await GetPersons();
+            var allPersons = await GetAllPersons();
             List<PersonResponse> matchingPersons = new();
             if (string.IsNullOrEmpty(searchby) || string.IsNullOrEmpty(searchString))
                 return allPersons;
@@ -150,7 +150,7 @@ namespace Services
             csvWriter.WriteField(nameof(PersonResponse.Address));
             csvWriter.WriteField(nameof(PersonResponse.ReceiveNewsLetters));
             csvWriter.NextRecord();
-            var persons = await GetPersons();
+            var persons = await GetAllPersons();
             foreach (var person in persons)
             {
                 csvWriter.WriteField(person.PersonName);
@@ -192,7 +192,7 @@ namespace Services
                 }
 
                 int row = 2;
-                var persons = await GetPersons();
+                var persons = await GetAllPersons();
                 foreach (var person in persons)
                 {
                     workSheet.Cells[row,1].Value = person.PersonName;

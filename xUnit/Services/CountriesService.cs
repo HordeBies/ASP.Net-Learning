@@ -35,7 +35,7 @@ namespace Services
             return country.ToCountryResponse();
         }
 
-        public async Task<List<CountryResponse>> GetCountries()
+        public async Task<List<CountryResponse>> GetAllCountries()
         {
             var countries = await db.Countries.ToListAsync();
             return countries.Select(c=> c.ToCountryResponse()).ToList();

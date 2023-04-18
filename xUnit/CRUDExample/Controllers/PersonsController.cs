@@ -22,7 +22,7 @@ namespace CRUDExample.Controllers
         [Route("index")]
         public async Task<IActionResult> Index(string searchBy, string? searchString, string sortBy = nameof(PersonResponse.PersonName),SortOrder sortOrder = SortOrder.Ascending)
         {
-            var model = await personsService.GetPersons();
+            var model = await personsService.GetAllPersons();
             ViewBag.SearchFields = new Dictionary<string, string>()
             {
                 { nameof(PersonResponse.PersonName),"Person Name" },
@@ -44,7 +44,7 @@ namespace CRUDExample.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            ViewBag.Countries = (await countriesService.GetCountries()).Select(c => new SelectListItem(c.CountryName,c.CountryID.ToString()));
+            ViewBag.Countries = (await countriesService.GetAllCountries()).Select(c => new SelectListItem(c.CountryName,c.CountryID.ToString()));
 
             return View();
         }
@@ -54,7 +54,7 @@ namespace CRUDExample.Controllers
         {
             if (!ModelState.IsValid) //client side validation makes this part obsolete
             {
-                ViewBag.Countries = (await countriesService.GetCountries()).Select(c => new SelectListItem(c.CountryName, c.CountryID.ToString()));
+                ViewBag.Countries = (await countriesService.GetAllCountries()).Select(c => new SelectListItem(c.CountryName, c.CountryID.ToString()));
                 ViewBag.Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
                 return View();
             }
@@ -68,7 +68,7 @@ namespace CRUDExample.Controllers
             var person = await personsService.GetPerson(PersonID);
             if (person == null)
                 return RedirectToAction("Index");
-            ViewBag.Countries = (await countriesService.GetCountries()).Select(c => new SelectListItem(c.CountryName, c.CountryID.ToString()));
+            ViewBag.Countries = (await countriesService.GetAllCountries()).Select(c => new SelectListItem(c.CountryName, c.CountryID.ToString()));
             return View(person.ToPersonUpdateRequest());
         }
         [HttpPost]
@@ -102,7 +102,7 @@ namespace CRUDExample.Controllers
         [Route("[action]")]
         public async Task<IActionResult> PersonsPDF()
         {
-            var persons = await personsService.GetPersons();
+            var persons = await personsService.GetAllPersons();
             return new ViewAsPdf("PersonsPDF", persons, ViewData)
             {
                 PageMargins = new(20,20,20,20),
