@@ -1,4 +1,5 @@
-﻿using Entities;
+﻿using Azure;
+using Entities;
 using ServiceContracts.Enums;
 using System;
 using System.Collections.Generic;
@@ -36,6 +37,26 @@ namespace ServiceContracts.DTO
                 Address = Address,
                 ReceiveNewsLetters = ReceiveNewsLetters
             };
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj == null) return false;
+            if (obj.GetType() != typeof(PersonUpdateRequest)) return false;
+            var other = (PersonUpdateRequest)obj;
+            return PersonID == other.PersonID &&
+                PersonName == other.PersonName &&
+                Email == other.Email &&
+                DateOfBirth == other.DateOfBirth &&
+                Gender == other.Gender &&
+                CountryID == other.CountryID &&
+                Address == other.Address &&
+                ReceiveNewsLetters == other.ReceiveNewsLetters;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }

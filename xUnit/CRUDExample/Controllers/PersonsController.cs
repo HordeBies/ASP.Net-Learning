@@ -56,7 +56,7 @@ namespace CRUDExample.Controllers
             {
                 ViewBag.Countries = (await countriesService.GetAllCountries()).Select(c => new SelectListItem(c.CountryName, c.CountryID.ToString()));
                 ViewBag.Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-                return View();
+                return View(request);
             }
             var response = await personsService.AddPerson(request);
             return RedirectToAction("Index","Persons");
