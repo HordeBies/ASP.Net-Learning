@@ -49,38 +49,38 @@ namespace Services
             return person.ToPersonResponse();
         }
 
-        public async Task<List<PersonResponse>> GetFilteredPersons(string searchby, string? searchString)
+        public async Task<List<PersonResponse>> GetFilteredPersons(string searchBy, string? searchString)
         {
-            List<PersonResponse> matchingPersons = new();
-            if (string.IsNullOrEmpty(searchby) || string.IsNullOrEmpty(searchString))
-                return await GetAllPersons();
-            Expression<Func<Person, bool>>? predicate = null;
-            switch (searchby)
+            List<Person> persons = searchBy switch
             {
-                case nameof(PersonResponse.PersonName):
-                    predicate = (p => p.PersonName.Contains(searchString));
-                    break;
-                case nameof(PersonResponse.Address):
-                    predicate = (p => p.Address.Contains(searchString));
-                break;
-                case nameof(PersonResponse.Country):
-                    predicate = (p => p.Country.CountryName.Contains(searchString));
-                    break;
-                case nameof(PersonResponse.Email):
-                    predicate = (p => p.Email.Contains(searchString));
-                    break;
-                case nameof(PersonResponse.DateOfBirth):
-                    predicate = (p => p.DateOfBirth.Value.ToString("dd MMMM yyyy").Contains(searchString));
-                    break;
-                case nameof(PersonResponse.Gender):
-                    predicate = (p => p.Gender.Equals(searchString));
-                    break;
-                default:
-                    break;
-            }
-            if (predicate == null)
-                return await GetAllPersons();
-            return (await personsRepository.GetFilteredPersons(predicate)).Select(p => p.ToPersonResponse()).ToList();
+                nameof(PersonResponse.PersonName) =>
+                 await personsRepository.GetFilteredPersons(temp =>
+                 temp.PersonName.Contains(searchString)),
+
+                nameof(PersonResponse.Email) =>
+                 await personsRepository.GetFilteredPersons(temp =>
+                 temp.Email.Contains(searchString)),
+
+                nameof(PersonResponse.DateOfBirth) =>
+                 await personsRepository.GetFilteredPersons(temp =>
+                 temp.DateOfBirth.Value.ToString("dd MMMM yyyy").Contains(searchString)),
+
+
+                nameof(PersonResponse.Gender) =>
+                 await personsRepository.GetFilteredPersons(temp =>
+                 temp.Gender.Contains(searchString)),
+
+                nameof(PersonResponse.CountryID) =>
+                 await personsRepository.GetFilteredPersons(temp =>
+                 temp.Country.CountryName.Contains(searchString)),
+
+                nameof(PersonResponse.Address) =>
+                await personsRepository.GetFilteredPersons(temp =>
+                temp.Address.Contains(searchString)),
+
+                _ => await personsRepository.GetAllPersons()
+            };
+            return persons.Select(temp => temp.ToPersonResponse()).ToList();
         }
 
         public async Task<List<PersonResponse>> GetSortedPersons(List<PersonResponse> collection, string sortby, SortOrder sortOrder)
