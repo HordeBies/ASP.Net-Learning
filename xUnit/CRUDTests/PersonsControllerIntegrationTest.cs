@@ -1,4 +1,6 @@
-﻿using FluentAssertions;
+﻿using Fizzler.Systems.HtmlAgilityPack;
+using FluentAssertions;
+using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,10 +21,16 @@ namespace CRUDTests
         public async Task Index_ToReturnView()
         {
             //Arrange
+            HtmlDocument html = new();
             //Act
             HttpResponseMessage response = await client.GetAsync("/Persons/Index");
+            var body = await response.Content.ReadAsStringAsync();
+            html.LoadHtml(body);
+            var document = html.DocumentNode;
+
             //Assert
             response.Should().BeSuccessful();
+            document.QuerySelectorAll("table.persons").Should().NotBeNull();
         }
         #endregion
     }
