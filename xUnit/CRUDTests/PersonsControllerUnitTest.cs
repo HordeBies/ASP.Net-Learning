@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CRUDTests
 {
-    public class PersonsControllerTest
+    public class PersonsControllerUnitTest
     {
         private readonly IPersonsService personsService;
         private readonly ICountriesService countriesService;
@@ -24,7 +24,7 @@ namespace CRUDTests
         private readonly Mock<ICountriesService> countriesServiceMock;
 
         private readonly IFixture fixture;
-        public PersonsControllerTest()
+        public PersonsControllerUnitTest()
         {
             fixture = new Fixture();
 
