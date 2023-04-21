@@ -1,34 +1,38 @@
 # ASP.Net-Learning
 
-This project contains a Visual Studio solution, which includes multiple projects created while following the Udemy bootcamp "Asp.Net Core 7 (.NET 7) | True Ultimate Guide". The projects in this solution cover various topics related to ASP.Net.
+This project contains a Visual Studio solution, which includes multiple projects created while following the Udemy bootcamp. The projects in this solution cover various topics related to ASP.Net.
 
 ## Projects
 
-Here is a list of the projects included in the solution:
+Here is a list of the projects/topics included in the solution:
 
-- MiddlewareExample
-- Assignment_LoginUsingMiddleware
-- RoutingExample
-- Assignment_Routing
-- ControllersExample
-- IActionResultExample
-- Assignment_Controller_Bank
-- ModelBindingExample
-- ModelValidationExample
-- Assignment_ModelBindingAndValidations
-- ViewsExample
-- StaticFilesExample
-- LayoutViewsExample
-- PartialViewsExample
-- ViewComponentsExample
-- DependencyInjection
-- EnvironmentsExample
-- ConfigurationExample
-- xUnit
+- ### Assignments
+  - Assignment_LoginUsingMiddleware
+  - Assignment_Routing
+  - Assignment_Controller_Bank
+  - Assignment_ModelBindingAndValidations
+- ### Basics
+  - MiddlewareExample
+  - RoutingExample
+  - ControllersExample
+  - IActionResultExample
+  - ModelBindingExample
+  - ModelValidationExample
+  - ViewsExample
+  - StaticFilesExample
+  - LayoutViewsExample
+  - PartialViewsExample
+  - ViewComponentsExample
+  - DependencyInjection
+  - EnvironmentsExample
+  - ConfigurationExample
+- ### xUnit, CRUD, Tag Helpers, EF Core, Moq, Repository
   - CRUDExample
   - CRUDTests
   - Entities
+  - Repositories
   - ServiceContracts
+  - RepositoryContracts
   - Services
 
 Feel free to explore each project to learn more about the specific topics covered in the bootcamp.
