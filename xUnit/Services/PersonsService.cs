@@ -12,6 +12,8 @@ using OfficeOpenXml;
 using RepositoryContracts;
 using System.Linq.Expressions;
 using Microsoft.Extensions.Logging;
+using Serilog;
+using SerilogTimings;
 
 namespace Services
 {
@@ -19,10 +21,12 @@ namespace Services
     {
         private readonly IPersonsRepository personsRepository;
         private readonly ILogger<PersonsService> logger;
-        public PersonsService(IPersonsRepository personsRepository, ILogger<PersonsService> logger)
+        private readonly IDiagnosticContext diagnosticContext;
+        public PersonsService(IPersonsRepository personsRepository, ILogger<PersonsService> logger, IDiagnosticContext diagnosticContext)
         {
             this.personsRepository = personsRepository;
             this.logger = logger;
+            this.diagnosticContext = diagnosticContext;
         }
 
         public async Task<PersonResponse> AddPerson(PersonAddRequest? request)
@@ -57,35 +61,40 @@ namespace Services
         public async Task<List<PersonResponse>> GetFilteredPersons(string searchBy, string? searchString)
         {
             logger.LogInformation("GetFilteredPersons method is called");
-            List<Person> persons = searchBy switch
+            List<Person> persons;
+            using (Operation.Time("Time for Filtered Persons from Database"))
             {
-                nameof(PersonResponse.PersonName) =>
-                 await personsRepository.GetFilteredPersons(temp =>
-                 temp.PersonName.Contains(searchString)),
+                persons = searchBy switch
+                {
+                    nameof(PersonResponse.PersonName) =>
+                     await personsRepository.GetFilteredPersons(temp =>
+                     temp.PersonName.Contains(searchString)),
 
-                nameof(PersonResponse.Email) =>
-                 await personsRepository.GetFilteredPersons(temp =>
-                 temp.Email.Contains(searchString)),
+                    nameof(PersonResponse.Email) =>
+                     await personsRepository.GetFilteredPersons(temp =>
+                     temp.Email.Contains(searchString)),
 
-                nameof(PersonResponse.DateOfBirth) =>
-                 await personsRepository.GetFilteredPersons(temp =>
-                 temp.DateOfBirth.Value.ToString("dd MMMM yyyy").Contains(searchString)),
+                    nameof(PersonResponse.DateOfBirth) =>
+                     await personsRepository.GetFilteredPersons(temp =>
+                     temp.DateOfBirth.Value.ToString("dd MMMM yyyy").Contains(searchString)),
 
 
-                nameof(PersonResponse.Gender) =>
-                 await personsRepository.GetFilteredPersons(temp =>
-                 temp.Gender.Contains(searchString)),
+                    nameof(PersonResponse.Gender) =>
+                     await personsRepository.GetFilteredPersons(temp =>
+                     temp.Gender.Contains(searchString)),
 
-                nameof(PersonResponse.CountryID) =>
-                 await personsRepository.GetFilteredPersons(temp =>
-                 temp.Country.CountryName.Contains(searchString)),
+                    nameof(PersonResponse.CountryID) =>
+                     await personsRepository.GetFilteredPersons(temp =>
+                     temp.Country.CountryName.Contains(searchString)),
 
-                nameof(PersonResponse.Address) =>
-                await personsRepository.GetFilteredPersons(temp =>
-                temp.Address.Contains(searchString)),
+                    nameof(PersonResponse.Address) =>
+                    await personsRepository.GetFilteredPersons(temp =>
+                    temp.Address.Contains(searchString)),
 
-                _ => await personsRepository.GetAllPersons()
-            };
+                    _ => await personsRepository.GetAllPersons()
+                };
+            }
+            diagnosticContext.Set("Persons", persons);
             return persons.Select(temp => temp.ToPersonResponse()).ToList();
         }
 
@@ -140,7 +149,7 @@ namespace Services
             MemoryStream stream = new();
             StreamWriter writer = new StreamWriter(stream);
             CsvConfiguration csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture);
-            CsvWriter csvWriter = new(writer,csvConfiguration,true);
+            CsvWriter csvWriter = new(writer, csvConfiguration, true);
             //csvWriter.WriteHeader<PersonResponse>();
             csvWriter.WriteField(nameof(PersonResponse.PersonName));
             csvWriter.WriteField(nameof(PersonResponse.Email));
@@ -173,7 +182,7 @@ namespace Services
         public async Task<MemoryStream> GetPersonsExcel()
         {
             MemoryStream stream = new();
-            using(ExcelPackage excelPackage = new(stream))
+            using (ExcelPackage excelPackage = new(stream))
             {
                 ExcelWorksheet workSheet = excelPackage.Workbook.Worksheets.Add("PersonsSheet");
                 workSheet.Cells["A1"].Value = nameof(PersonResponse.PersonName);
@@ -185,7 +194,7 @@ namespace Services
                 workSheet.Cells["G1"].Value = nameof(PersonResponse.Address);
                 workSheet.Cells["H1"].Value = nameof(PersonResponse.ReceiveNewsLetters);
 
-                using(ExcelRange headerCells = workSheet.Cells["A1:H1"])
+                using (ExcelRange headerCells = workSheet.Cells["A1:H1"])
                 {
                     headerCells.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
                     headerCells.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
@@ -196,14 +205,14 @@ namespace Services
                 var persons = await GetAllPersons();
                 foreach (var person in persons)
                 {
-                    workSheet.Cells[row,1].Value = person.PersonName;
-                    workSheet.Cells[row,2].Value = person.Email;
-                    workSheet.Cells[row,3].Value = person.DateOfBirth;
-                    workSheet.Cells[row,4].Value = person.Age;
-                    workSheet.Cells[row,5].Value = person.Gender;
-                    workSheet.Cells[row,6].Value = person.Country;
-                    workSheet.Cells[row,7].Value = person.Address;
-                    workSheet.Cells[row,8].Value = person.ReceiveNewsLetters;
+                    workSheet.Cells[row, 1].Value = person.PersonName;
+                    workSheet.Cells[row, 2].Value = person.Email;
+                    workSheet.Cells[row, 3].Value = person.DateOfBirth;
+                    workSheet.Cells[row, 4].Value = person.Age;
+                    workSheet.Cells[row, 5].Value = person.Gender;
+                    workSheet.Cells[row, 6].Value = person.Country;
+                    workSheet.Cells[row, 7].Value = person.Address;
+                    workSheet.Cells[row, 8].Value = person.ReceiveNewsLetters;
                     row++;
                 }
 

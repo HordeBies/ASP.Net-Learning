@@ -4,14 +4,14 @@ using Services;
 using ServiceContracts.Enums;
 using Xunit.Abstractions;
 using Entities;
-using Microsoft.EntityFrameworkCore;
-using EntityFrameworkCoreMock;
 using AutoFixture;
 using FluentAssertions;
 using RepositoryContracts;
 using Moq;
 using System.Linq.Expressions;
 using System.Globalization;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace CRUDTests
 {
@@ -32,13 +32,10 @@ namespace CRUDTests
             personsRepositoryMock = new();
             personsRepository = personsRepositoryMock.Object;
 
-            //var countries = new List<Country>();
-            //var persons = new List<Person>();
-            //var dbContextMock = new DbContextMock<ApplicationDbContext>(new DbContextOptionsBuilder<ApplicationDbContext>().Options);
-            //var dbContext = dbContextMock.Object;
-            //dbContextMock.CreateDbSetMock(x => x.Countries, countries);
-            //dbContextMock.CreateDbSetMock(x => x.Persons, persons);
-            personsService = new PersonsService(personsRepository);
+            var diagnosticContextMock = new Mock<IDiagnosticContext>();
+            var loggerMock = new Mock<ILogger<PersonsService>>();
+
+            personsService = new PersonsService(personsRepository, loggerMock.Object, diagnosticContextMock.Object);
         }
         #region AddPerson
         [Fact]
