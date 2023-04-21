@@ -12,17 +12,20 @@ namespace CRUDExample.Controllers
     {
         private readonly IPersonsService personsService;
         private readonly ICountriesService countriesService;
-        public PersonsController(IPersonsService personsService, ICountriesService countriesService)
+        private readonly ILogger<PersonsController> logger;
+        public PersonsController(IPersonsService personsService, ICountriesService countriesService, ILogger<PersonsController> logger)
         {
             this.personsService = personsService;
             this.countriesService = countriesService;
+            this.logger = logger;
         }
 
         [Route("/")]
         [Route("index")]
         public async Task<IActionResult> Index(string searchBy, string? searchString, string sortBy = nameof(PersonResponse.PersonName),SortOrder sortOrder = SortOrder.Ascending)
         {
-            var model = await personsService.GetAllPersons();
+            logger.LogInformation("Index action method is called");
+            logger.LogDebug($"searchBy: {searchBy}, searchString: {searchString}, sortBy: {sortBy}, sortOrder: {sortOrder}");
             ViewBag.SearchFields = new Dictionary<string, string>()
             {
                 { nameof(PersonResponse.PersonName),"Person Name" },
@@ -32,7 +35,7 @@ namespace CRUDExample.Controllers
                 { nameof(PersonResponse.Country),"Country" },
                 { nameof(PersonResponse.Address),"Address" },
             };
-            model = await personsService.GetFilteredPersons(searchBy, searchString);
+            var model = await personsService.GetFilteredPersons(searchBy, searchString);
             ViewBag.searchBy = searchBy;
             ViewBag.searchString = searchString;
             model = await personsService.GetSortedPersons(model, sortBy, sortOrder);

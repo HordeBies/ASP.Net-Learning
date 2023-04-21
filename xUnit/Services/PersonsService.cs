@@ -11,15 +11,18 @@ using CsvHelper.Configuration;
 using OfficeOpenXml;
 using RepositoryContracts;
 using System.Linq.Expressions;
+using Microsoft.Extensions.Logging;
 
 namespace Services
 {
     public class PersonsService : IPersonsService
     {
-        private IPersonsRepository personsRepository;
-        public PersonsService(IPersonsRepository personsRepository)
+        private readonly IPersonsRepository personsRepository;
+        private readonly ILogger<PersonsService> logger;
+        public PersonsService(IPersonsRepository personsRepository, ILogger<PersonsService> logger)
         {
             this.personsRepository = personsRepository;
+            this.logger = logger;
         }
 
         public async Task<PersonResponse> AddPerson(PersonAddRequest? request)
@@ -38,11 +41,13 @@ namespace Services
 
         public async Task<List<PersonResponse>> GetAllPersons()
         {
+            logger.LogInformation("GetAllPersons method is called");
             return (await personsRepository.GetAllPersons()).Select(p => p.ToPersonResponse()).ToList();
         }
 
         public async Task<PersonResponse?> GetPerson(Guid? PersonID)
         {
+            logger.LogInformation("GetPerson method is called");
             if (PersonID == null) return null;
             var person = await personsRepository.GetPerson(PersonID.Value);
             if (person == null) return null;
@@ -51,6 +56,7 @@ namespace Services
 
         public async Task<List<PersonResponse>> GetFilteredPersons(string searchBy, string? searchString)
         {
+            logger.LogInformation("GetFilteredPersons method is called");
             List<Person> persons = searchBy switch
             {
                 nameof(PersonResponse.PersonName) =>
@@ -85,6 +91,7 @@ namespace Services
 
         public async Task<List<PersonResponse>> GetSortedPersons(List<PersonResponse> collection, string sortby, SortOrder sortOrder)
         {
+            logger.LogInformation("GetSortedPersons method is called");
             if (string.IsNullOrEmpty(sortby))
                 return collection;
             List<PersonResponse> sorted = sortby switch
