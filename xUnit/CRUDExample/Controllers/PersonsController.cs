@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CRUDExample.Filters.ActionFilters;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Rotativa.AspNetCore;
 using ServiceContracts;
@@ -22,25 +23,18 @@ namespace CRUDExample.Controllers
 
         [Route("/")]
         [Route("index")]
+        [TypeFilter(typeof(PersonsListActionFilter))]
         public async Task<IActionResult> Index(string searchBy, string? searchString, string sortBy = nameof(PersonResponse.PersonName),SortOrder sortOrder = SortOrder.Ascending)
         {
             logger.LogInformation("Index action method is called");
             logger.LogDebug($"searchBy: {searchBy}, searchString: {searchString}, sortBy: {sortBy}, sortOrder: {sortOrder}");
-            ViewBag.SearchFields = new Dictionary<string, string>()
-            {
-                { nameof(PersonResponse.PersonName),"Person Name" },
-                { nameof(PersonResponse.Email),"Email" },
-                { nameof(PersonResponse.Gender),"Gender" },
-                { nameof(PersonResponse.DateOfBirth),"Date Of Birth" },
-                { nameof(PersonResponse.Country),"Country" },
-                { nameof(PersonResponse.Address),"Address" },
-            };
+
             var model = await personsService.GetFilteredPersons(searchBy, searchString);
-            ViewBag.searchBy = searchBy;
-            ViewBag.searchString = searchString;
+            //ViewBag.searchBy = searchBy;
+            //ViewBag.searchString = searchString;
             model = await personsService.GetSortedPersons(model, sortBy, sortOrder);
-            ViewBag.sortBy = sortBy;
-            ViewBag.sortOrder = sortOrder.ToString();
+            //ViewBag.sortBy = sortBy;
+            //ViewBag.sortOrder = sortOrder.ToString();
             return View(model);
         }
         [Route("create")]

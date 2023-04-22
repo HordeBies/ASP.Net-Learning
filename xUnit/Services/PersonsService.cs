@@ -1,16 +1,13 @@
 ﻿using Entities;
-using Microsoft.EntityFrameworkCore;
 using ServiceContracts;
 using ServiceContracts.DTO;
 using ServiceContracts.Enums;
 using Services.Helpers;
-using System;
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using OfficeOpenXml;
 using RepositoryContracts;
-using System.Linq.Expressions;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using SerilogTimings;
@@ -62,37 +59,44 @@ namespace Services
         {
             logger.LogInformation("GetFilteredPersons method is called");
             List<Person> persons;
-            using (Operation.Time("Time for Filtered Persons from Database"))
+            if (string.IsNullOrEmpty(searchString))
             {
-                persons = searchBy switch
+                persons = await personsRepository.GetAllPersons();
+            }
+            else
+            {
+                using (Operation.Time("Time for Filtered Persons from Database"))
                 {
-                    nameof(PersonResponse.PersonName) =>
-                     await personsRepository.GetFilteredPersons(temp =>
-                     temp.PersonName.Contains(searchString)),
+                    persons = searchBy switch
+                    {
+                        nameof(PersonResponse.PersonName) =>
+                         await personsRepository.GetFilteredPersons(temp =>
+                         temp.PersonName.Contains(searchString)),
 
-                    nameof(PersonResponse.Email) =>
-                     await personsRepository.GetFilteredPersons(temp =>
-                     temp.Email.Contains(searchString)),
+                        nameof(PersonResponse.Email) =>
+                         await personsRepository.GetFilteredPersons(temp =>
+                         temp.Email.Contains(searchString)),
 
-                    nameof(PersonResponse.DateOfBirth) =>
-                     await personsRepository.GetFilteredPersons(temp =>
-                     temp.DateOfBirth.Value.ToString("dd MMMM yyyy").Contains(searchString)),
+                        nameof(PersonResponse.DateOfBirth) =>
+                         await personsRepository.GetFilteredPersons(temp =>
+                         temp.DateOfBirth.Value.ToString().Contains(searchString)),
 
 
-                    nameof(PersonResponse.Gender) =>
-                     await personsRepository.GetFilteredPersons(temp =>
-                     temp.Gender.Contains(searchString)),
+                        nameof(PersonResponse.Gender) =>
+                         await personsRepository.GetFilteredPersons(temp =>
+                         temp.Gender.Contains(searchString)),
 
-                    nameof(PersonResponse.CountryID) =>
-                     await personsRepository.GetFilteredPersons(temp =>
-                     temp.Country.CountryName.Contains(searchString)),
+                        nameof(PersonResponse.CountryID) =>
+                         await personsRepository.GetFilteredPersons(temp =>
+                         temp.Country.CountryName.Contains(searchString)),
 
-                    nameof(PersonResponse.Address) =>
-                    await personsRepository.GetFilteredPersons(temp =>
-                    temp.Address.Contains(searchString)),
+                        nameof(PersonResponse.Address) =>
+                        await personsRepository.GetFilteredPersons(temp =>
+                        temp.Address.Contains(searchString)),
 
-                    _ => await personsRepository.GetAllPersons()
-                };
+                        _ => await personsRepository.GetAllPersons()
+                    };
+                }
             }
             diagnosticContext.Set("Persons", persons);
             return persons.Select(temp => temp.ToPersonResponse()).ToList();

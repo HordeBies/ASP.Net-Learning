@@ -1,6 +1,4 @@
-﻿using Entities;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
 using OfficeOpenXml;
 using RepositoryContracts;
 using ServiceContracts;
