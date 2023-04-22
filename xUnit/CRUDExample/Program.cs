@@ -5,6 +5,9 @@ using RepositoryContracts;
 using Repositories;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using CRUDExample.Filters.ActionFilters;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +21,14 @@ builder.Host.UseSerilog((HostBuilderContext context, IServiceProvider services, 
 });
 
 //Services
-builder.Services.AddControllersWithViews();
+//builder.Services.AddScoped<ResponseHeaderActionFilter>(provider => new ResponseHeaderActionFilter(provider.GetRequiredService<ILogger<ResponseHeaderActionFilter>>(), "X-Custom-Key-Global", "Custom-Value-Global", 2));
+builder.Services.AddControllersWithViews(options =>
+{
+    //options.Filters.Add<ResponseHeaderActionFilter>(5);
+    //options.Filters.AddService<ResponseHeaderActionFilter>(2);
+    options.Filters.Add(new ResponseHeaderActionFilter(builder.Services.BuildServiceProvider().GetRequiredService<ILogger<ResponseHeaderActionFilter>>(), "X-Custom-Key-Global", "Custom-Value-Global", 2));
+});
+
 builder.Services.AddScoped<ICountriesService, CountriesService>();
 builder.Services.AddScoped<IPersonsService, PersonsService>();
 builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
