@@ -49,14 +49,9 @@ namespace CRUDExample.Controllers
         }
         [Route("create")]
         [HttpPost]
+        [TypeFilter(typeof(PersonRedirectPostActionFilter))]
         public async Task<IActionResult> Create([FromForm]PersonAddRequest request)
         {
-            if (!ModelState.IsValid) //client side validation makes this part obsolete
-            {
-                ViewBag.Countries = (await countriesService.GetAllCountries()).Select(c => new SelectListItem(c.CountryName, c.CountryID.ToString()));
-                ViewBag.Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-                return View(request);
-            }
             var response = await personsService.AddPerson(request);
             return RedirectToAction("Index","Persons");
         }
@@ -72,9 +67,10 @@ namespace CRUDExample.Controllers
         }
         [HttpPost]
         [Route("[action]/{PersonID}")]
-        public async Task<IActionResult> Edit(PersonUpdateRequest person)
+        [TypeFilter(typeof(PersonRedirectPostActionFilter))]
+        public async Task<IActionResult> Edit(PersonUpdateRequest request)
         {
-            await personsService.UpdatePerson(person);
+            await personsService.UpdatePerson(request);
             return RedirectToAction("Index", "Persons");
         }
 

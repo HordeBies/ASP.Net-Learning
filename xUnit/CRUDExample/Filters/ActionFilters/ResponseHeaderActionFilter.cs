@@ -2,7 +2,7 @@
 
 namespace CRUDExample.Filters.ActionFilters
 {
-    public class ResponseHeaderActionFilter : IActionFilter, IOrderedFilter
+    public class ResponseHeaderActionFilter : IAsyncActionFilter, IOrderedFilter
     {
         private readonly ILogger<ResponseHeaderActionFilter> logger;
         private readonly string key;
@@ -15,16 +15,16 @@ namespace CRUDExample.Filters.ActionFilters
             this.value = value;
             Order = order;
         }
-        public void OnActionExecuting(ActionExecutingContext context)
-        {
-            logger.LogInformation("{ClassName}.{MethodName} method", nameof(ResponseHeaderActionFilter), nameof(OnActionExecuting));
-        }
 
-        public void OnActionExecuted(ActionExecutedContext context)
+        public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            logger.LogInformation("{ClassName}.{MethodName} method", nameof(ResponseHeaderActionFilter), nameof(OnActionExecuted));
+            logger.LogInformation("{ClassName}.{MethodName} method - before", nameof(ResponseHeaderActionFilter), nameof(OnActionExecutionAsync));
 
-            context.HttpContext.Response.Headers.Add(key, value);
+            await next();
+
+            logger.LogInformation("{ClassName}.{MethodName} method - after", nameof(ResponseHeaderActionFilter), nameof(OnActionExecutionAsync));
+
+            context.HttpContext.Response.Headers[key] = value;
         }
     }
 }
