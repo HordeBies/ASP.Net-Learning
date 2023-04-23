@@ -1,4 +1,5 @@
-﻿using CRUDExample.Filters.ActionFilters;
+﻿using CRUDExample.Filters;
+using CRUDExample.Filters.ActionFilters;
 using CRUDExample.Filters.AuthorizationFilters;
 using CRUDExample.Filters.ExceptionFilters;
 using CRUDExample.Filters.ResourceFilters;
@@ -13,8 +14,10 @@ using ServiceContracts.Enums;
 namespace CRUDExample.Controllers
 {
     [Route("Persons")]
-    [TypeFilter(typeof(ResponseHeaderActionFilter), Arguments = new object[] { "X-Custom-Key-Controller", "Custom-Value-Controller", 3}, Order = 3)]
+    //[TypeFilter(typeof(ResponseHeaderActionFilter), Arguments = new object[] { "X-Custom-Key-Controller", "Custom-Value-Controller", 3}, Order = 3)]
+    [ResponseHeaderFilterFactory("X-Custom-Key-Controller", "Custom-Value-Controller", 3)]
     [TypeFilter(typeof(HandleExceptionFilter))]
+    [TypeFilter(typeof(PersonAlwaysRunResultFilter))]
     public class PersonsController : Controller
     {
         private readonly IPersonsService personsService;
@@ -29,9 +32,11 @@ namespace CRUDExample.Controllers
 
         [Route("/")]
         [Route("index")]
-        [TypeFilter(typeof(PersonsListActionFilter), Order = 4)]
-        [TypeFilter(typeof(ResponseHeaderActionFilter), Arguments = new object[] { "X-Custom-Key-Action", "Custom-Value-Action", 1}, Order = 1)]
-        [TypeFilter(typeof(PersonsListResultFilter))]
+        [ServiceFilter(typeof(PersonsListActionFilter), Order = 4)]
+        //[TypeFilter(typeof(ResponseHeaderActionFilter), Arguments = new object[] { "X-Custom-Key-Action", "Custom-Value-Action", 1}, Order = 1)]
+        [ResponseHeaderFilterFactory("X-Custom-Key-Action", "Custom-Value-Action", 1)]
+        [ServiceFilter(typeof(PersonsListResultFilter))]
+        [SkipFilter]
         public async Task<IActionResult> Index(string searchBy, string? searchString, string sortBy = nameof(PersonResponse.PersonName),SortOrder sortOrder = SortOrder.Ascending)
         {
             logger.LogInformation("Index action method is called");
@@ -47,7 +52,7 @@ namespace CRUDExample.Controllers
         }
         [HttpGet]
         [Route("create")]
-        [TypeFilter(typeof(FeatureDisabledResourceFilter))]
+        //[TypeFilter(typeof(FeatureDisabledResourceFilter))]
         public async Task<IActionResult> Create()
         {
             ViewBag.Countries = (await countriesService.GetAllCountries()).Select(c => new SelectListItem(c.CountryName,c.CountryID.ToString()));
@@ -64,7 +69,7 @@ namespace CRUDExample.Controllers
         }
         [HttpGet]
         [Route("[action]/{PersonID}")]
-        [TypeFilter(typeof(TokenResultFilter))]
+        //[TypeFilter(typeof(TokenResultFilter))]
         public async Task<IActionResult> Edit(Guid PersonID)
         {
             var person = await personsService.GetPerson(PersonID);

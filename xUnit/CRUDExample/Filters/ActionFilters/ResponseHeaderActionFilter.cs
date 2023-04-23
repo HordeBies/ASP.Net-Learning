@@ -2,18 +2,38 @@
 
 namespace CRUDExample.Filters.ActionFilters
 {
-    public class ResponseHeaderActionFilter : IAsyncActionFilter, IOrderedFilter
+    public class ResponseHeaderFilterFactoryAttribute : Attribute, IFilterFactory, IOrderedFilter
     {
-        private readonly ILogger<ResponseHeaderActionFilter> logger;
-        private readonly string key;
-        private readonly string value;
-        public int Order { get; init; }
-        public ResponseHeaderActionFilter(ILogger<ResponseHeaderActionFilter> logger, string key, string value, int order)
+        private string? key;
+        private string? value;
+        public ResponseHeaderFilterFactoryAttribute(string key, string value, int order = 0, bool isReusable = false)
         {
-            this.logger = logger;
             this.key = key;
             this.value = value;
-            Order = order;
+            this.Order = order;
+            this.IsReusable = isReusable;
+            
+        }
+        public bool IsReusable { get; }
+
+        public int Order { get; }
+
+        public IFilterMetadata CreateInstance(IServiceProvider serviceProvider)
+        {
+            var instance = serviceProvider.GetRequiredService<ResponseHeaderActionFilter>();
+            instance.Key = key;
+            instance.Value = value;
+            return instance;
+        }
+    }
+    public class ResponseHeaderActionFilter : IAsyncActionFilter
+    {
+        private readonly ILogger<ResponseHeaderActionFilter> logger;
+        public string? Key;
+        public string? Value;
+        public ResponseHeaderActionFilter(ILogger<ResponseHeaderActionFilter> logger)
+        {
+            this.logger = logger;
         }
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -21,10 +41,9 @@ namespace CRUDExample.Filters.ActionFilters
             logger.LogInformation("{ClassName}.{MethodName} method - before", nameof(ResponseHeaderActionFilter), nameof(OnActionExecutionAsync));
 
             await next();
-
             logger.LogInformation("{ClassName}.{MethodName} method - after", nameof(ResponseHeaderActionFilter), nameof(OnActionExecutionAsync));
 
-            context.HttpContext.Response.Headers[key] = value;
+            context.HttpContext.Response.Headers[Key] = Value;
         }
     }
 }

@@ -8,6 +8,7 @@ using Serilog;
 using CRUDExample.Filters.ActionFilters;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.AspNetCore.Mvc.Filters;
+using CRUDExample.Filters.ResultFilters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,13 +22,17 @@ builder.Host.UseSerilog((HostBuilderContext context, IServiceProvider services, 
 });
 
 //Services
-//builder.Services.AddScoped<ResponseHeaderActionFilter>(provider => new ResponseHeaderActionFilter(provider.GetRequiredService<ILogger<ResponseHeaderActionFilter>>(), "X-Custom-Key-Global", "Custom-Value-Global", 2));
 builder.Services.AddControllersWithViews(options =>
 {
     //options.Filters.Add<ResponseHeaderActionFilter>(5);
+    options.Filters.Add(new ResponseHeaderFilterFactoryAttribute("X-Custom-Key-Global", "Custom-Value-Global", 2));
     //options.Filters.AddService<ResponseHeaderActionFilter>(2);
-    options.Filters.Add(new ResponseHeaderActionFilter(builder.Services.BuildServiceProvider().GetRequiredService<ILogger<ResponseHeaderActionFilter>>(), "X-Custom-Key-Global", "Custom-Value-Global", 2));
 });
+//Filter Services
+//builder.Services.AddScoped<ResponseHeaderActionFilter>(provider => new ResponseHeaderActionFilter(provider.GetRequiredService<ILogger<ResponseHeaderActionFilter>>(), "X-Custom-Key-Global", "Custom-Value-Global", 2));
+builder.Services.AddTransient<ResponseHeaderActionFilter>();
+builder.Services.AddTransient<PersonsListActionFilter>();
+builder.Services.AddTransient<PersonsListResultFilter>();
 
 builder.Services.AddScoped<ICountriesService, CountriesService>();
 builder.Services.AddScoped<IPersonsService, PersonsService>();
