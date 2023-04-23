@@ -1,4 +1,8 @@
 ﻿using CRUDExample.Filters.ActionFilters;
+using CRUDExample.Filters.AuthorizationFilters;
+using CRUDExample.Filters.ExceptionFilters;
+using CRUDExample.Filters.ResourceFilters;
+using CRUDExample.Filters.ResultFilters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Rotativa.AspNetCore;
@@ -10,6 +14,7 @@ namespace CRUDExample.Controllers
 {
     [Route("Persons")]
     [TypeFilter(typeof(ResponseHeaderActionFilter), Arguments = new object[] { "X-Custom-Key-Controller", "Custom-Value-Controller", 3}, Order = 3)]
+    [TypeFilter(typeof(HandleExceptionFilter))]
     public class PersonsController : Controller
     {
         private readonly IPersonsService personsService;
@@ -26,6 +31,7 @@ namespace CRUDExample.Controllers
         [Route("index")]
         [TypeFilter(typeof(PersonsListActionFilter), Order = 4)]
         [TypeFilter(typeof(ResponseHeaderActionFilter), Arguments = new object[] { "X-Custom-Key-Action", "Custom-Value-Action", 1}, Order = 1)]
+        [TypeFilter(typeof(PersonsListResultFilter))]
         public async Task<IActionResult> Index(string searchBy, string? searchString, string sortBy = nameof(PersonResponse.PersonName),SortOrder sortOrder = SortOrder.Ascending)
         {
             logger.LogInformation("Index action method is called");
@@ -39,16 +45,17 @@ namespace CRUDExample.Controllers
             //ViewBag.sortOrder = sortOrder.ToString();
             return View(model);
         }
-        [Route("create")]
         [HttpGet]
+        [Route("create")]
+        [TypeFilter(typeof(FeatureDisabledResourceFilter))]
         public async Task<IActionResult> Create()
         {
             ViewBag.Countries = (await countriesService.GetAllCountries()).Select(c => new SelectListItem(c.CountryName,c.CountryID.ToString()));
 
             return View();
         }
-        [Route("create")]
         [HttpPost]
+        [Route("create")]
         [TypeFilter(typeof(PersonRedirectPostActionFilter))]
         public async Task<IActionResult> Create([FromForm]PersonAddRequest request)
         {
@@ -57,6 +64,7 @@ namespace CRUDExample.Controllers
         }
         [HttpGet]
         [Route("[action]/{PersonID}")]
+        [TypeFilter(typeof(TokenResultFilter))]
         public async Task<IActionResult> Edit(Guid PersonID)
         {
             var person = await personsService.GetPerson(PersonID);
@@ -68,6 +76,7 @@ namespace CRUDExample.Controllers
         [HttpPost]
         [Route("[action]/{PersonID}")]
         [TypeFilter(typeof(PersonRedirectPostActionFilter))]
+        [TypeFilter(typeof(TokenAuthorizationFilter))]
         public async Task<IActionResult> Edit(PersonUpdateRequest request)
         {
             await personsService.UpdatePerson(request);
