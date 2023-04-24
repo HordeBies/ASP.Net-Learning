@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using ServiceContracts.DTO;
+using ServiceContracts.Enums;
 
 namespace CRUDExample.Filters.ActionFilters
 {
@@ -48,8 +49,12 @@ namespace CRUDExample.Filters.ActionFilters
                     controller.ViewData["searchString"] = value?.ToString();
                 if(args.TryGetValue("sortBy", out value))
                     controller.ViewData["sortBy"] = value?.ToString();
+                else
+                    controller.ViewData["sortBy"] = nameof(PersonResponse.PersonName);
                 if(args.TryGetValue("sortOrder", out value))
                     controller.ViewData["sortOrder"] = value?.ToString();
+                else
+                    controller.ViewData["sortOrder"] = SortOrder.Ascending.ToString();
             }
             controller.ViewBag.SearchFields = new Dictionary<string, string>()
             {

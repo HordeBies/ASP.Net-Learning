@@ -84,7 +84,7 @@ namespace Services
 
                         nameof(PersonResponse.Gender) =>
                          await personsRepository.GetFilteredPersons(temp =>
-                         temp.Gender.Contains(searchString)),
+                         temp.Gender.Equals(searchString)),
 
                         nameof(PersonResponse.CountryID) =>
                          await personsRepository.GetFilteredPersons(temp =>
