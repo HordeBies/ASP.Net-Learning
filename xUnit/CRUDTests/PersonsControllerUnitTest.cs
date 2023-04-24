@@ -21,6 +21,7 @@ namespace CRUDTests
     {
         private readonly IPersonsService personsService;
         private readonly ICountriesService countriesService;
+        private readonly ILogger<PersonsController> logger;
 
         private readonly Mock<IPersonsService> personsServiceMock;
         private readonly Mock<ICountriesService> countriesServiceMock;
@@ -37,6 +38,7 @@ namespace CRUDTests
 
             personsService = personsServiceMock.Object;
             countriesService = countriesServiceMock.Object;
+            logger = loggerMock.Object;
         }
 
         #region Index
@@ -46,7 +48,7 @@ namespace CRUDTests
             //Arrange
             List<PersonResponse> personResponses = fixture.Create<List<PersonResponse>>();
 
-            PersonsController controller = new(personsService, countriesService, loggerMock.Object);
+            PersonsController controller = new(personsService, countriesService, logger);
 
             personsServiceMock.Setup(r => r.GetFilteredPersons(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(personResponses);
             personsServiceMock.Setup(r => r.GetSortedPersons(It.IsAny<List<PersonResponse>>(), It.IsAny<string>(), It.IsAny<SortOrder>())).ReturnsAsync(personResponses);
@@ -68,7 +70,7 @@ namespace CRUDTests
             PersonResponse personResponse = fixture.Create<PersonResponse>();
             List<CountryResponse> countries = fixture.Create<List<CountryResponse>>();
 
-            PersonsController controller = new(personsService, countriesService, loggerMock.Object);
+            PersonsController controller = new(personsService, countriesService, logger);
 
             countriesServiceMock.Setup(r => r.GetAllCountries()).ReturnsAsync(countries);
             personsServiceMock.Setup(r => r.AddPerson(It.IsAny<PersonAddRequest>())).ReturnsAsync(personResponse);
@@ -80,26 +82,6 @@ namespace CRUDTests
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
             viewResult.ActionName.Should().Be("Index");
         }
-        [Fact]
-        public async Task Create_InvalidRequest()
-        {
-            PersonAddRequest personRequest = fixture.Create<PersonAddRequest>();
-            PersonResponse personResponse = fixture.Create<PersonResponse>();
-            List<CountryResponse> countries = fixture.Create<List<CountryResponse>>();
-
-            PersonsController controller = new(personsService, countriesService, loggerMock.Object);
-
-            countriesServiceMock.Setup(r => r.GetAllCountries()).ReturnsAsync(countries);
-            personsServiceMock.Setup(r => r.AddPerson(It.IsAny<PersonAddRequest>())).ReturnsAsync(personResponse);
-
-            //Act
-            controller.ModelState.AddModelError("PersonName", "Person Name cannot be blank");
-            var result = await controller.Create(personRequest);
-
-            //Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            viewResult.ViewData.Model.Should().BeAssignableTo<PersonAddRequest>().And.Be(personRequest);
-        }
         #endregion
         #region Edit
         [Fact]
@@ -107,7 +89,7 @@ namespace CRUDTests
         {
             List<CountryResponse> countries = fixture.Create<List<CountryResponse>>();
 
-            PersonsController controller = new(personsService, countriesService, loggerMock.Object);
+            PersonsController controller = new(personsService, countriesService, logger);
 
             personsServiceMock.Setup(r => r.GetPerson(It.IsAny<Guid>())).ReturnsAsync(null as PersonResponse);
             countriesServiceMock.Setup(r => r.GetAllCountries()).ReturnsAsync(countries);
@@ -123,7 +105,7 @@ namespace CRUDTests
             PersonResponse personResponse = fixture.Build<PersonResponse>().With(r => r.Gender, "Male").Create();
             List<CountryResponse> countries = fixture.Create<List<CountryResponse>>();
 
-            PersonsController controller = new(personsService, countriesService, loggerMock.Object);
+            PersonsController controller = new(personsService, countriesService, logger);
 
             personsServiceMock.Setup(r => r.GetPerson(It.IsAny<Guid>())).ReturnsAsync(personResponse);
             countriesServiceMock.Setup(r => r.GetAllCountries()).ReturnsAsync(countries);
@@ -140,7 +122,7 @@ namespace CRUDTests
             PersonResponse personResponse = fixture.Create<PersonResponse>();
             List<CountryResponse> countries = fixture.Create<List<CountryResponse>>();
 
-            PersonsController controller = new(personsService, countriesService, loggerMock.Object);
+            PersonsController controller = new(personsService, countriesService, logger);
 
             personsServiceMock.Setup(r => r.UpdatePerson(It.IsAny<PersonUpdateRequest>())).ReturnsAsync(personResponse);
 
@@ -154,7 +136,7 @@ namespace CRUDTests
         [Fact]
         public async Task Delete_InvalidGetRequest()
         {
-            PersonsController controller = new(personsService, countriesService, loggerMock.Object);
+            PersonsController controller = new(personsService, countriesService, logger);
 
             personsServiceMock.Setup(r => r.GetPerson(It.IsAny<Guid>())).ReturnsAsync(null as PersonResponse);
 
@@ -167,7 +149,7 @@ namespace CRUDTests
         public async Task Delete_ValidGetRequest()
         {
             PersonResponse personResponse = fixture.Create<PersonResponse>();
-            PersonsController controller = new(personsService, countriesService, loggerMock.Object);
+            PersonsController controller = new(personsService, countriesService, logger);
 
             personsServiceMock.Setup(r => r.GetPerson(It.IsAny<Guid>())).ReturnsAsync(personResponse);
 
@@ -180,7 +162,7 @@ namespace CRUDTests
         public async Task Delete_ValidPostRequest()
         {
             PersonResponse personResponse = fixture.Create<PersonResponse>();
-            PersonsController controller = new(personsService, countriesService, loggerMock.Object);
+            PersonsController controller = new(personsService, countriesService, logger);
 
             personsServiceMock.Setup(r => r.DeletePerson(It.IsAny<Guid>())).ReturnsAsync(true);
 

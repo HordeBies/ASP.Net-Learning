@@ -169,6 +169,7 @@ namespace CRUDTests
         {
             var personList = CreatePersons();
             personsRepositoryMock.Setup(r => r.GetFilteredPersons(It.IsAny<Expression<Func<Person, bool>>>())).ReturnsAsync(personList);
+            personsRepositoryMock.Setup(r => r.GetAllPersons()).ReturnsAsync(personList);
             var expected = personList.Select(p => p.ToPersonResponse()).ToList();
             var actual = await personsService.GetFilteredPersons(nameof(PersonResponse.PersonName), "");
             testOutputHelper.WriteLine("Expected:");

@@ -6,9 +6,8 @@ using Repositories;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using CRUDExample.Filters.ActionFilters;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.AspNetCore.Mvc.Filters;
 using CRUDExample.Filters.ResultFilters;
+using CRUDExample.StartupExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,31 +20,7 @@ builder.Host.UseSerilog((HostBuilderContext context, IServiceProvider services, 
 
 });
 
-//Services
-builder.Services.AddControllersWithViews(options =>
-{
-    //options.Filters.Add<ResponseHeaderActionFilter>(5);
-    options.Filters.Add(new ResponseHeaderFilterFactoryAttribute("X-Custom-Key-Global", "Custom-Value-Global", 2));
-    //options.Filters.AddService<ResponseHeaderActionFilter>(2);
-});
-//Filter Services
-//builder.Services.AddScoped<ResponseHeaderActionFilter>(provider => new ResponseHeaderActionFilter(provider.GetRequiredService<ILogger<ResponseHeaderActionFilter>>(), "X-Custom-Key-Global", "Custom-Value-Global", 2));
-builder.Services.AddTransient<ResponseHeaderActionFilter>();
-builder.Services.AddTransient<PersonsListActionFilter>();
-builder.Services.AddTransient<PersonsListResultFilter>();
-
-builder.Services.AddScoped<ICountriesService, CountriesService>();
-builder.Services.AddScoped<IPersonsService, PersonsService>();
-builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
-builder.Services.AddScoped<IPersonsRepository, PersonsRepository>();
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("PersonsConnection"));
-});
-builder.Services.AddHttpLogging(options =>
-{
-    options.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.RequestProperties | Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.ResponsePropertiesAndHeaders;
-});
+builder.Services.ConfigureServices(builder.Configuration);
 
 var app = builder.Build();
 
