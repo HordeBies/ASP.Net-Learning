@@ -26,7 +26,14 @@ namespace CRUDExample.StartupExtensions
             services.AddTransient<PersonsListResultFilter>();
 
             services.AddScoped<ICountriesService, CountriesService>();
-            services.AddScoped<IPersonsService, PersonsService>();
+            
+            //Persons Services
+            services.AddScoped<IPersonsAdderService,PersonsAdderService>();
+            services.AddScoped<IPersonsDeleterService,PersonsDeleterService>();
+            services.AddScoped<IPersonsGetterService,PersonsGetterService>();
+            services.AddScoped<IPersonsSorterService,PersonsSorterService>();
+            services.AddScoped<IPersonsUpdaterService,PersonsUpdaterService>();
+
             services.AddScoped<ICountriesRepository, CountriesRepository>();
             services.AddScoped<IPersonsRepository, PersonsRepository>();
 

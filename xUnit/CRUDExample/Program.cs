@@ -1,13 +1,6 @@
-using ServiceContracts;
-using Services;
-using Entities;
-using RepositoryContracts;
-using Repositories;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
-using CRUDExample.Filters.ActionFilters;
-using CRUDExample.Filters.ResultFilters;
 using CRUDExample.StartupExtensions;
+using CRUDExample.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +16,14 @@ builder.Host.UseSerilog((HostBuilderContext context, IServiceProvider services, 
 builder.Services.ConfigureServices(builder.Configuration);
 
 var app = builder.Build();
+
+if (builder.Environment.IsDevelopment())
+    app.UseDeveloperExceptionPage();
+else
+{
+    app.UseExceptionHandler("/Error");
+    app.UseExceptionHandlingMiddleware();
+}
 
 if(builder.Environment.IsEnvironment("Test") == false)
     Rotativa.AspNetCore.RotativaConfiguration.Setup("wwwroot", wkhtmltopdfRelativePath: "Rotativa");

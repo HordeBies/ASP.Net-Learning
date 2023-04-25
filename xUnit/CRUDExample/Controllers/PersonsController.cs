@@ -16,16 +16,14 @@ namespace CRUDExample.Controllers
     [Route("Persons")]
     //[TypeFilter(typeof(ResponseHeaderActionFilter), Arguments = new object[] { "X-Custom-Key-Controller", "Custom-Value-Controller", 3}, Order = 3)]
     [ResponseHeaderFilterFactory("X-Custom-Key-Controller", "Custom-Value-Controller", 3)]
-    [TypeFilter(typeof(HandleExceptionFilter))]
+    //[TypeFilter(typeof(HandleExceptionFilter))]
     [TypeFilter(typeof(PersonAlwaysRunResultFilter))]
     public class PersonsController : Controller
     {
-        private readonly IPersonsService personsService;
         private readonly ICountriesService countriesService;
         private readonly ILogger<PersonsController> logger;
-        public PersonsController(IPersonsService personsService, ICountriesService countriesService, ILogger<PersonsController> logger)
+        public PersonsController(ICountriesService countriesService, ILogger<PersonsController> logger)
         {
-            this.personsService = personsService;
             this.countriesService = countriesService;
             this.logger = logger;
         }
@@ -37,15 +35,15 @@ namespace CRUDExample.Controllers
         [ResponseHeaderFilterFactory("X-Custom-Key-Action", "Custom-Value-Action", 1)]
         [ServiceFilter(typeof(PersonsListResultFilter))]
         [SkipFilter]
-        public async Task<IActionResult> Index(string searchBy, string? searchString, string sortBy = nameof(PersonResponse.PersonName),SortOrder sortOrder = SortOrder.Ascending)
+        public async Task<IActionResult> Index([FromServices]IPersonsGetterService personsGetterService, [FromServices]IPersonsSorterService personsSorterService, string searchBy, string? searchString, string sortBy = nameof(PersonResponse.PersonName), SortOrder sortOrder = SortOrder.Ascending)
         {
             logger.LogInformation("Index action method is called");
             logger.LogDebug($"searchBy: {searchBy}, searchString: {searchString}, sortBy: {sortBy}, sortOrder: {sortOrder}");
 
-            var model = await personsService.GetFilteredPersons(searchBy, searchString);
+            var model = await personsGetterService.GetFilteredPersons(searchBy, searchString);
             //ViewBag.searchBy = searchBy;
             //ViewBag.searchString = searchString;
-            model = await personsService.GetSortedPersons(model, sortBy, sortOrder);
+            model = await personsSorterService.GetSortedPersons(model, sortBy, sortOrder);
             //ViewBag.sortBy = sortBy;
             //ViewBag.sortOrder = sortOrder.ToString();
             return View(model);
@@ -55,24 +53,24 @@ namespace CRUDExample.Controllers
         //[TypeFilter(typeof(FeatureDisabledResourceFilter))]
         public async Task<IActionResult> Create()
         {
-            ViewBag.Countries = (await countriesService.GetAllCountries()).Select(c => new SelectListItem(c.CountryName,c.CountryID.ToString()));
+            ViewBag.Countries = (await countriesService.GetAllCountries()).Select(c => new SelectListItem(c.CountryName, c.CountryID.ToString()));
 
             return View();
         }
         [HttpPost]
         [Route("create")]
         [TypeFilter(typeof(PersonRedirectPostActionFilter))]
-        public async Task<IActionResult> Create([FromForm]PersonAddRequest request)
+        public async Task<IActionResult> Create([FromServices]IPersonsAdderService personsAdderService, [FromForm]PersonAddRequest request)
         {
-            var response = await personsService.AddPerson(request);
-            return RedirectToAction("Index","Persons");
+            var response = await personsAdderService.AddPerson(request);
+            return RedirectToAction("Index", "Persons");
         }
         [HttpGet]
         [Route("[action]/{PersonID}")]
         //[TypeFilter(typeof(TokenResultFilter))]
-        public async Task<IActionResult> Edit(Guid PersonID)
+        public async Task<IActionResult> Edit([FromServices]IPersonsGetterService personsGetterService, Guid PersonID)
         {
-            var person = await personsService.GetPerson(PersonID);
+            var person = await personsGetterService.GetPerson(PersonID);
             if (person == null)
                 return RedirectToAction("Index");
             ViewBag.Countries = (await countriesService.GetAllCountries()).Select(c => new SelectListItem(c.CountryName, c.CountryID.ToString()));
@@ -82,17 +80,17 @@ namespace CRUDExample.Controllers
         [Route("[action]/{PersonID}")]
         [TypeFilter(typeof(PersonRedirectPostActionFilter))]
         [TypeFilter(typeof(TokenAuthorizationFilter))]
-        public async Task<IActionResult> Edit(PersonUpdateRequest request)
+        public async Task<IActionResult> Edit([FromServices]IPersonsUpdaterService personsUpdaterService, PersonUpdateRequest request)
         {
-            await personsService.UpdatePerson(request);
+            await personsUpdaterService.UpdatePerson(request);
             return RedirectToAction("Index", "Persons");
         }
 
         [HttpGet]
         [Route("[action]/{PersonID}")]
-        public async Task<IActionResult> Delete(Guid PersonID)
+        public async Task<IActionResult> Delete([FromServices] IPersonsGetterService personsGetterService, Guid PersonID)
         {
-            var person = await personsService.GetPerson(PersonID);
+            var person = await personsGetterService.GetPerson(PersonID);
             if(person == null)
                 return RedirectToAction("Index");
             return View(person);
@@ -100,18 +98,18 @@ namespace CRUDExample.Controllers
 
         [HttpPost]
         [Route("[action]/{PersonID}")]
-        public async Task<IActionResult> Delete(PersonResponse person)
+        public async Task<IActionResult> Delete([FromServices]IPersonsDeleterService personsDeleterService, PersonResponse person)
         {
-            var success = await personsService.DeletePerson(person.PersonID);
+            var success = await personsDeleterService.DeletePerson(person.PersonID);
             //TempData["MessageType"] = success ? "Deleted" : "PersonNotFound";
             //TempData["MessageText"] = success ? "Successfully deleted " + person.PersonName : "Could not found " + person.PersonName;
             return RedirectToAction("Index");
         }
 
         [Route("[action]")]
-        public async Task<IActionResult> PersonsPDF()
+        public async Task<IActionResult> PersonsPDF([FromServices]IPersonsGetterService personsGetterService)
         {
-            var persons = await personsService.GetAllPersons();
+            var persons = await personsGetterService.GetAllPersons();
             return new ViewAsPdf("PersonsPDF", persons, ViewData)
             {
                 PageMargins = new(20,20,20,20),
@@ -121,15 +119,15 @@ namespace CRUDExample.Controllers
         }
 
         [Route("[action]")]
-        public async Task<IActionResult> PersonsCSV()
+        public async Task<IActionResult> PersonsCSV([FromServices] IPersonsGetterService personsGetterService)
         {
-            var stream = await personsService.GetPersonsCSV();
+            var stream = await personsGetterService.GetPersonsCSV();
             return File(stream, "application/octet-stream","persons.csv");
         }
         [Route("[action]")]
-        public async Task<IActionResult> PersonsExcel()
+        public async Task<IActionResult> PersonsExcel([FromServices] IPersonsGetterService personsGetterService)
         {
-            var stream = await personsService.GetPersonsExcel();
+            var stream = await personsGetterService.GetPersonsExcel();
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "persons.xlsx");
         }
     }
