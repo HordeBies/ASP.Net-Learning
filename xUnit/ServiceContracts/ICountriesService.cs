@@ -1,5 +1,4 @@
-﻿using Entities;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using ServiceContracts.DTO;
 
 namespace ServiceContracts

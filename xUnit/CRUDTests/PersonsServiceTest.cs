@@ -17,7 +17,11 @@ namespace CRUDTests
 {
     public class PersonsServiceTest
     {
-        private readonly IPersonsService personsService;
+        private readonly IPersonsAdderService personsAdderService;
+        private readonly IPersonsDeleterService personsDeleterService;
+        private readonly IPersonsGetterService personsGetterService;
+        private readonly IPersonsSorterService personsSorterService;
+        private readonly IPersonsUpdaterService personsUpdaterService;
 
         private readonly Mock<IPersonsRepository> personsRepositoryMock;
         private readonly IPersonsRepository personsRepository;
@@ -32,16 +36,17 @@ namespace CRUDTests
             personsRepositoryMock = new();
             personsRepository = personsRepositoryMock.Object;
 
-            var diagnosticContextMock = new Mock<IDiagnosticContext>();
-            var loggerMock = new Mock<ILogger<PersonsService>>();
-
-            personsService = new PersonsService(personsRepository, loggerMock.Object, diagnosticContextMock.Object);
+            personsAdderService = new PersonsAdderService(personsRepository);
+            personsDeleterService = new PersonsDeleterService(personsRepository);
+            personsGetterService = new PersonsGetterService(personsRepository, new Mock<ILogger<PersonsGetterService>>().Object, new Mock<IDiagnosticContext>().Object);
+            personsSorterService = new PersonsSorterService(new Mock<ILogger<PersonsSorterService>>().Object);
+            personsUpdaterService = new PersonsUpdaterService(personsRepository);
         }
         #region AddPerson
         [Fact]
         public async Task AddPerson_NullRequest_ToBeArgumentNullException()
         {
-            var action = (async () => await personsService.AddPerson(null));
+            var action = (async () => await personsAdderService.AddPerson(null));
             await action.Should().ThrowAsync<ArgumentNullException>();
         }
         [Fact]
@@ -53,7 +58,7 @@ namespace CRUDTests
             var person = personAddRequest.ToPerson();
             personsRepositoryMock.Setup(r => r.AddPerson(It.IsAny<Person>())).ReturnsAsync(person);
 
-            var action = (async () => await personsService.AddPerson(personAddRequest));
+            var action = (async () => await personsAdderService.AddPerson(personAddRequest));
             await action.Should().ThrowAsync<ArgumentException>();
         }
         [Fact]
@@ -67,7 +72,7 @@ namespace CRUDTests
             var exptected = person.ToPersonResponse();
 
             //Act
-            var actual = await personsService.AddPerson(personAddRequest);
+            var actual = await personsAdderService.AddPerson(personAddRequest);
             
             exptected.PersonID = actual.PersonID;
 
@@ -82,7 +87,7 @@ namespace CRUDTests
         [Fact]
         public async Task GetPerson_NullPersonID_ToBeNull()
         {
-            var expected = await personsService.GetPerson(null);
+            var expected = await personsGetterService.GetPerson(null);
             expected.Should().BeNull();
         }
         [Fact]
@@ -90,7 +95,7 @@ namespace CRUDTests
         {
             var guid = Guid.NewGuid();
             personsRepositoryMock.Setup(r => r.GetPerson(guid)).ReturnsAsync(null as Person);
-            var expected = await personsService.GetPerson(guid);
+            var expected = await personsGetterService.GetPerson(guid);
             expected.Should().BeNull();
         }
         [Fact]
@@ -103,7 +108,7 @@ namespace CRUDTests
             personsRepositoryMock.Setup(r => r.GetPerson(It.IsAny<Guid>())).ReturnsAsync(person);
             var expected = person.ToPersonResponse();
 
-            var actual = await personsService.GetPerson(person.PersonID);
+            var actual = await personsGetterService.GetPerson(person.PersonID);
             actual.Should().Be(expected);
         }
         #endregion
@@ -136,7 +141,7 @@ namespace CRUDTests
         public async Task GetAllPersons_ToBeEmptyCollection()
         {
             personsRepositoryMock.Setup(r => r.GetAllPersons()).ReturnsAsync(new List<Person>());
-            var expected = await personsService.GetAllPersons();
+            var expected = await personsGetterService.GetAllPersons();
             expected.Should().BeEmpty();
         }
         [Fact]
@@ -145,7 +150,7 @@ namespace CRUDTests
             var personList = CreatePersons();
             personsRepositoryMock.Setup(r => r.GetAllPersons()).ReturnsAsync(personList);
             var expected = personList.Select(p => p.ToPersonResponse()).ToList();
-            var actual = await personsService.GetAllPersons();
+            var actual = await personsGetterService.GetAllPersons();
 
             testOutputHelper.WriteLine("Expected:");
             foreach (var item in expected)
@@ -171,7 +176,7 @@ namespace CRUDTests
             personsRepositoryMock.Setup(r => r.GetFilteredPersons(It.IsAny<Expression<Func<Person, bool>>>())).ReturnsAsync(personList);
             personsRepositoryMock.Setup(r => r.GetAllPersons()).ReturnsAsync(personList);
             var expected = personList.Select(p => p.ToPersonResponse()).ToList();
-            var actual = await personsService.GetFilteredPersons(nameof(PersonResponse.PersonName), "");
+            var actual = await personsGetterService.GetFilteredPersons(nameof(PersonResponse.PersonName), "");
             testOutputHelper.WriteLine("Expected:");
             foreach (var item in expected)
             {
@@ -192,7 +197,7 @@ namespace CRUDTests
             personsRepositoryMock.Setup(r => r.GetFilteredPersons(It.IsAny<Expression<Func<Person, bool>>>())).ReturnsAsync(personList.Where(p => p.PersonName != null && p.PersonName.Contains("ha",StringComparison.OrdinalIgnoreCase)).ToList());
             var expected = personList.Select(p => p.ToPersonResponse()).ToList();
 
-            var actual = await personsService.GetFilteredPersons(nameof(PersonResponse.PersonName), "ha");
+            var actual = await personsGetterService.GetFilteredPersons(nameof(PersonResponse.PersonName), "ha");
             testOutputHelper.WriteLine("Expected:");
             foreach (var item in expected)
             {
@@ -216,7 +221,7 @@ namespace CRUDTests
             personsRepositoryMock.Setup(r => r.GetAllPersons()).ReturnsAsync(personList);
             var expected = personList.Select(p => p.ToPersonResponse()).ToList();
 
-            var actual = await personsService.GetSortedPersons(await personsService.GetAllPersons(), nameof(PersonResponse.PersonName), SortOrder.Descending);
+            var actual = await personsSorterService.GetSortedPersons(await personsGetterService.GetAllPersons(), nameof(PersonResponse.PersonName), SortOrder.Descending);
 
             var comparer = CultureInfo.InvariantCulture.CompareInfo.GetStringComparer(CompareOptions.IgnoreCase);
             actual.Should().BeInDescendingOrder(expected => expected.PersonName, comparer:comparer);
@@ -228,7 +233,7 @@ namespace CRUDTests
         public async Task UpdatePerson_NullRequest_ToBeArgumentNullException()
         {
             PersonUpdateRequest? request = null;
-            var action = (async () => await personsService.UpdatePerson(request));
+            var action = (async () => await personsUpdaterService.UpdatePerson(request));
             await action.Should().ThrowAsync<ArgumentNullException>();
         }
         [Fact]
@@ -240,7 +245,7 @@ namespace CRUDTests
                 .With(r => r.Country, null as Country)
                 .Create();
             personsRepositoryMock.Setup(r => r.GetPerson(It.IsAny<Guid>())).ReturnsAsync(null as Person);
-            var action = (async () => await personsService.UpdatePerson(request.ToPersonResponse().ToPersonUpdateRequest()));
+            var action = (async () => await personsUpdaterService.UpdatePerson(request.ToPersonResponse().ToPersonUpdateRequest()));
             await action.Should().ThrowAsync<ArgumentException>();
         }
         [Fact]
@@ -255,7 +260,7 @@ namespace CRUDTests
             var personUpdateRequest = personResponse.ToPersonUpdateRequest();
             personUpdateRequest.PersonName = null;
 
-            var action = (async () => await personsService.UpdatePerson(personUpdateRequest));
+            var action = (async () => await personsUpdaterService.UpdatePerson(personUpdateRequest));
             await action.Should().ThrowAsync<ArgumentException>();
         }
         [Fact]
@@ -276,7 +281,7 @@ namespace CRUDTests
             personsRepositoryMock.Setup(r => r.UpdatePerson(It.IsAny<Person>())).ReturnsAsync(updatedPerson);
             var expected = updatedPerson.ToPersonResponse();
 
-            var actual = await personsService.UpdatePerson(request);
+            var actual = await personsUpdaterService.UpdatePerson(request);
 
             actual.Should().Be(expected);
         }
@@ -288,7 +293,7 @@ namespace CRUDTests
         {
             Guid nonExistentID = Guid.NewGuid();
 
-            bool result = await personsService.DeletePerson(nonExistentID);
+            bool result = await personsDeleterService.DeletePerson(nonExistentID);
 
             result.Should().BeFalse();
         }
@@ -305,7 +310,7 @@ namespace CRUDTests
             personsRepositoryMock.Setup(r => r.GetPerson(person.PersonID)).ReturnsAsync(person);
             personsRepositoryMock.Setup(r => r.DeletePerson(person.PersonID)).ReturnsAsync(true);
 
-            bool result = await personsService.DeletePerson(person.PersonID);
+            bool result = await personsDeleterService.DeletePerson(person.PersonID);
 
             result.Should().BeTrue();
         }
