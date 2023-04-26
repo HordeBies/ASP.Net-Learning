@@ -26,7 +26,7 @@ Here is a list of the projects/topics included in the solution:
   - DependencyInjection
   - EnvironmentsExample
   - ConfigurationExample
-- ### xUnit, CRUD, Tag Helpers, EF Core, Moq, Repository
+- ### xUnit, CRUD, Tag Helpers, EF Core, Moq, Repository, Logging(Serilog), Filters, Error Handling, SOLID
   - CRUDExample
   - CRUDTests
   - Entities
@@ -34,5 +34,14 @@ Here is a list of the projects/topics included in the solution:
   - ServiceContracts
   - RepositoryContracts
   - Services
+- ### Clean Architecture
+  - #### Structure
+    - ContactsManager.Core
+    - ContactsManager.UI
+    - ContactsManager.Infrastructure
+  - #### Tests
+    - ContactsManager.ControllerTests
+    - ContactsManager.ServiceTests
+    - ContactsManager.IntegrationTests
 
 Feel free to explore each project to learn more about the specific topics covered in the bootcamp.
