@@ -1,36 +1,36 @@
-﻿using Entities;
+﻿using CsvHelper.Configuration;
+using CsvHelper;
+using Entities;
+using Microsoft.Extensions.Logging;
+using OfficeOpenXml;
+using RepositoryContracts;
+using Serilog;
 using ServiceContracts;
 using ServiceContracts.DTO;
 using System.Globalization;
-using CsvHelper;
-using CsvHelper.Configuration;
-using OfficeOpenXml;
-using RepositoryContracts;
-using Microsoft.Extensions.Logging;
-using Serilog;
 using SerilogTimings;
 
 namespace Services
 {
-    public class PersonsGetterService : IPersonsGetterService
+    public class PersonsGetterService_CompactExcel : IPersonsGetterService // Instead of reimplementing you can always use another service that implements IPersonsGetterService for the same purpose methods
     {
         private readonly IPersonsRepository personsRepository;
         private readonly ILogger<PersonsGetterService> logger;
         private readonly IDiagnosticContext diagnosticContext;
-        public PersonsGetterService(IPersonsRepository personsRepository, ILogger<PersonsGetterService> logger, IDiagnosticContext diagnosticContext)
+        public PersonsGetterService_CompactExcel(IPersonsRepository personsRepository, ILogger<PersonsGetterService> logger, IDiagnosticContext diagnosticContext)
         {
             this.personsRepository = personsRepository;
             this.logger = logger;
             this.diagnosticContext = diagnosticContext;
         }
 
-        public virtual async Task<List<PersonResponse>> GetAllPersons()
+        public async Task<List<PersonResponse>> GetAllPersons()
         {
             logger.LogInformation("GetAllPersons method is called");
             return (await personsRepository.GetAllPersons()).Select(p => p.ToPersonResponse()).ToList();
         }
 
-        public virtual async Task<PersonResponse?> GetPerson(Guid? PersonID)
+        public async Task<PersonResponse?> GetPerson(Guid? PersonID)
         {
             logger.LogInformation("GetPerson method is called");
             if (PersonID == null) return null;
@@ -39,7 +39,7 @@ namespace Services
             return person.ToPersonResponse();
         }
 
-        public virtual async Task<List<PersonResponse>> GetFilteredPersons(string searchBy, string? searchString)
+        public async Task<List<PersonResponse>> GetFilteredPersons(string searchBy, string? searchString)
         {
             logger.LogInformation("GetFilteredPersons method is called");
             List<Person> persons;
@@ -86,7 +86,7 @@ namespace Services
             return persons.Select(temp => temp.ToPersonResponse()).ToList();
         }
 
-        public virtual async Task<MemoryStream> GetPersonsCSV()
+        public async Task<MemoryStream> GetPersonsCSV()
         {
             MemoryStream stream = new();
             StreamWriter writer = new StreamWriter(stream);
@@ -121,22 +121,18 @@ namespace Services
             return stream;
         }
 
-        public virtual async Task<MemoryStream> GetPersonsExcel()
+        public async Task<MemoryStream> GetPersonsExcel()
         {
             MemoryStream stream = new();
             using (ExcelPackage excelPackage = new(stream))
             {
                 ExcelWorksheet workSheet = excelPackage.Workbook.Worksheets.Add("PersonsSheet");
                 workSheet.Cells["A1"].Value = nameof(PersonResponse.PersonName);
-                workSheet.Cells["B1"].Value = nameof(PersonResponse.Email);
-                workSheet.Cells["C1"].Value = nameof(PersonResponse.DateOfBirth);
-                workSheet.Cells["D1"].Value = nameof(PersonResponse.Age);
-                workSheet.Cells["E1"].Value = nameof(PersonResponse.Gender);
-                workSheet.Cells["F1"].Value = nameof(PersonResponse.Country);
-                workSheet.Cells["G1"].Value = nameof(PersonResponse.Address);
-                workSheet.Cells["H1"].Value = nameof(PersonResponse.ReceiveNewsLetters);
+                workSheet.Cells["B1"].Value = nameof(PersonResponse.Age);
+                workSheet.Cells["C1"].Value = nameof(PersonResponse.Gender);
 
-                using (ExcelRange headerCells = workSheet.Cells["A1:H1"])
+
+                using (ExcelRange headerCells = workSheet.Cells["A1:C1"])
                 {
                     headerCells.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
                     headerCells.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
@@ -148,17 +144,12 @@ namespace Services
                 foreach (var person in persons)
                 {
                     workSheet.Cells[row, 1].Value = person.PersonName;
-                    workSheet.Cells[row, 2].Value = person.Email;
-                    workSheet.Cells[row, 3].Value = person.DateOfBirth;
-                    workSheet.Cells[row, 4].Value = person.Age;
-                    workSheet.Cells[row, 5].Value = person.Gender;
-                    workSheet.Cells[row, 6].Value = person.Country;
-                    workSheet.Cells[row, 7].Value = person.Address;
-                    workSheet.Cells[row, 8].Value = person.ReceiveNewsLetters;
+                    workSheet.Cells[row, 2].Value = person.Age;
+                    workSheet.Cells[row, 3].Value = person.Gender;
                     row++;
                 }
 
-                workSheet.Cells[$"A1:H{row}"].AutoFitColumns();
+                workSheet.Cells[$"A1:C{row}"].AutoFitColumns();
 
                 await excelPackage.SaveAsync();
             }

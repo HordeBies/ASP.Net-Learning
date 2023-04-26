@@ -30,7 +30,12 @@ namespace CRUDExample.StartupExtensions
             //Persons Services
             services.AddScoped<IPersonsAdderService,PersonsAdderService>();
             services.AddScoped<IPersonsDeleterService,PersonsDeleterService>();
-            services.AddScoped<IPersonsGetterService,PersonsGetterService>();
+            
+            //services.AddScoped<IPersonsGetterService,PersonsGetterService>();            
+            //Both implementations work for OCP but PersonsGetterServiceChild_CompactExcel overrides the base class method and breaks the LSP principle therefore we prefer to use PersonsGetterService_CompactExcel
+            //services.AddScoped<IPersonsGetterService, PersonsGetterServiceChild_CompactExcel>();
+            services.AddScoped<IPersonsGetterService, PersonsGetterService_CompactExcel>();
+
             services.AddScoped<IPersonsSorterService,PersonsSorterService>();
             services.AddScoped<IPersonsUpdaterService,PersonsUpdaterService>();
 
