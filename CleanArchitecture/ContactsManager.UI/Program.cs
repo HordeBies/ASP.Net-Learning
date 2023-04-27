@@ -30,6 +30,7 @@ if (builder.Environment.IsEnvironment("Test") == false)
 app.UseSerilogRequestLogging();
 app.UseHttpLogging();
 app.UseStaticFiles();
+app.UseAuthentication();
 app.UseRouting();
 app.MapControllers();
 

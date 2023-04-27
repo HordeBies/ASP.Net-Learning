@@ -73,14 +73,17 @@
             <div class="w-25"></div>
             <div class="flex-1">
                 <button type="submit" class="button button-green-back">Register</button>
-                <div asp-validation-summary="All" class="text-red ml"></div>
-                @if(ViewBag.Errors != null)
+                @if(ViewBag.Errors == null)
+                {
+                    <div asp-validation-summary="All" class="text-red ml"></div>
+                }
+                else
                 {
                     <div class="text-red ml">
                         <ul>
                             @foreach (string error in ViewBag.Errors)
                             {
-                                <li class="ml">@error</li>
+                                <li>@error</li>
                             }
                         </ul>
                     </div>
