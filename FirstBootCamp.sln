@@ -69,21 +69,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Exceptions", "xUnit\Excepti
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CleanArchitecture", "CleanArchitecture", "{004A6AF0-C729-42B4-8E5D-9BFC2A4E9AEE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContactsManager.UI", "CleanArchitecture\ContactsManager.UI\ContactsManager.UI.csproj", "{83204942-4571-416D-8487-F5639D791880}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContactsManager.UI", "CleanArchitecture\ContactsManager.UI\ContactsManager.UI.csproj", "{83204942-4571-416D-8487-F5639D791880}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3EB16FF7-4AFF-41F4-BB50-E3413255407D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{4D362EB5-D8B5-49B8-8AF9-AF2A0A4A31FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContactsManager.Core", "CleanArchitecture\ContactsManager.Core\ContactsManager.Core.csproj", "{BD554676-2087-46E8-952F-C5B80E33331C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContactsManager.Core", "CleanArchitecture\ContactsManager.Core\ContactsManager.Core.csproj", "{BD554676-2087-46E8-952F-C5B80E33331C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContactsManager.Infrastructure", "CleanArchitecture\ContactsManager.Infrastructure\ContactsManager.Infrastructure.csproj", "{6501FDA4-4CDB-4709-B1D8-7644146A19D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContactsManager.Infrastructure", "CleanArchitecture\ContactsManager.Infrastructure\ContactsManager.Infrastructure.csproj", "{6501FDA4-4CDB-4709-B1D8-7644146A19D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContactsManager.ServiceTests", "CleanArchitecture\ContactsManager.ServiceTests\ContactsManager.ServiceTests.csproj", "{C6496F93-2DC9-4351-B849-C3CC80CDDF88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContactsManager.ServiceTests", "CleanArchitecture\ContactsManager.ServiceTests\ContactsManager.ServiceTests.csproj", "{C6496F93-2DC9-4351-B849-C3CC80CDDF88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContactsManager.ControllerTests", "CleanArchitecture\ContactsManager.ControllerTests\ContactsManager.ControllerTests.csproj", "{6FF0D791-4E9E-43D4-9F04-349685652FE1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContactsManager.ControllerTests", "CleanArchitecture\ContactsManager.ControllerTests\ContactsManager.ControllerTests.csproj", "{6FF0D791-4E9E-43D4-9F04-349685652FE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContactsManager.IntegrationTests", "CleanArchitecture\ContactsManager.IntegrationTests\ContactsManager.IntegrationTests.csproj", "{60032E99-697E-4DF8-A9D8-6ECFFE364E61}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContactsManager.IntegrationTests", "CleanArchitecture\ContactsManager.IntegrationTests\ContactsManager.IntegrationTests.csproj", "{60032E99-697E-4DF8-A9D8-6ECFFE364E61}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

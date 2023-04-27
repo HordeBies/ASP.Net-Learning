@@ -1,11 +1,13 @@
 ﻿using ContactsManager.Core.Domain.Entities;
+using ContactsManager.Core.Domain.IdentityEntities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
 namespace ContactsManager.Infrastructure.DbContexts
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
     {
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {

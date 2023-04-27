@@ -1,10 +1,13 @@
-﻿using ContactsManager.Core.Domain.RepositoryContracts;
+﻿using ContactsManager.Core.Domain.IdentityEntities;
+using ContactsManager.Core.Domain.RepositoryContracts;
 using ContactsManager.Core.ServiceContracts;
 using ContactsManager.Core.Services;
 using ContactsManager.Infrastructure.DbContexts;
 using ContactsManager.Infrastructure.Repositories;
 using ContactsManager.UI.Filters.ActionFilters;
 using ContactsManager.UI.Filters.ResultFilters;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace ContactsManager.UI.StartupExtensions
@@ -46,6 +49,11 @@ namespace ContactsManager.UI.StartupExtensions
             {
                 options.UseSqlServer(configuration.GetConnectionString("PersonsConnection"));
             });
+
+            services.AddIdentity<ApplicationUser,ApplicationRole>().AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders()
+                .AddUserStore<UserStore<ApplicationUser,ApplicationRole,ApplicationDbContext, Guid>>()
+                .AddRoleStore<RoleStore<ApplicationRole,ApplicationDbContext,Guid>>();
 
             services.AddHttpLogging(options =>
             {
