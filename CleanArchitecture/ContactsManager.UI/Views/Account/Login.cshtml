@@ -1,7 +1,7 @@
-﻿@model RegisterRequest
+﻿@model LoginRequest
 @{
-    ViewBag.Title = "Register";
-    ViewBag.CurrentUrl = "~/Account/Register";
+    ViewBag.Title = "Login Page";
+    ViewBag.CurrentUrl = "~/Account/Login";
 }
 
 <div class="flex">
@@ -15,21 +15,11 @@
 </div>
 
 <div class="form-container">
-    Already Registered? <a asp-controller="Account" asp-action="Login" class="link-hover">Login</a>
+    Not Registered? <a asp-controller="Account" asp-action="Register" class="link-hover">Register</a>
 
-    <h2 class="text-large">Register</h2>
+    <h2 class="text-large">Login</h2>
 
-    <form asp-controller="Account" asp-action="Register" method="post">
-        <div class="form-field flex">
-            <div class="w-25">
-                <label asp-for="PersonName" class="form-label pt">Full Name</label>
-            </div>
-            <div class="flex-1">
-                <input asp-for="PersonName" class="form-input" />
-                <span asp-validation-for="PersonName" class="text-red"></span>
-            </div>
-        </div>
-
+    <form asp-controller="Account" asp-action="Login" method="post">
         <div class="form-field flex">
             <div class="w-25">
                 <label asp-for="Email" class="form-label pt">Email</label>
@@ -39,17 +29,6 @@
                 <span asp-validation-for="Email" class="text-red"></span>
             </div>
         </div>
-
-        <div class="form-field flex">
-            <div class="w-25">
-                <label asp-for="Phone" class="form-label pt">Phone Number</label>
-            </div>
-            <div class="flex-1">
-                <input asp-for="Phone" class="form-input" />
-                <span asp-validation-for="Phone" class="text-red"></span>
-            </div>
-        </div>
-
         <div class="form-field flex">
             <div class="w-25">
                 <label asp-for="Password" class="form-label pt">Password</label>
@@ -59,22 +38,19 @@
                 <span asp-validation-for="Password" class="text-red"></span>
             </div>
         </div>
-
         <div class="form-field flex">
             <div class="w-25">
-                <label asp-for="ConfirmPassword" class="form-label pt">Confirm Password</label>
             </div>
             <div class="flex-1">
-                <input asp-for="ConfirmPassword" class="form-input" />
-                <span asp-validation-for="ConfirmPassword" class="text-red"></span>
+                <input asp-for="IsPersistent"/>
+                <label asp-for="IsPersistent" class="form-label pl">Keep me signed in</label>
             </div>
         </div>
-
         <div class="form-field flex">
             <div class="w-25"></div>
             <div class="flex-1">
-                <button type="submit" class="button button-green-back">Register</button>
-                @if(ViewBag.Errors == null)
+                <button type="submit" class="button button-green-back">Login</button>
+                @if (ViewBag.Errors == null)
                 {
                     <div asp-validation-summary="All" class="text-red ml"></div>
                 }
@@ -93,7 +69,6 @@
         </div>
     </form>
 </div>
-
 
 @section Scripts{
     <script asp-fallback-test="window.jQuery.validator" asp-fallback-src="~/jquery.validate.min.js" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" integrity="sha512-rstIgDs0xPgmG6RX1Aba4KV5cWJbAMcvRCVmglpam9SoHZiUCyQVDdH2LPlxoHtrv17XWblE/V/PP+Tr04hbtA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>

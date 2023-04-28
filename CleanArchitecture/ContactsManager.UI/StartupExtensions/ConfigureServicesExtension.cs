@@ -50,7 +50,25 @@ namespace ContactsManager.UI.StartupExtensions
                 options.UseSqlServer(configuration.GetConnectionString("PersonsConnection"));
             });
 
-            services.AddIdentity<ApplicationUser,ApplicationRole>().AddEntityFrameworkStores<ApplicationDbContext>()
+            services.AddIdentity<ApplicationUser,ApplicationRole>(options =>
+            {
+                // Default Password complexity
+                //options.Password.RequiredLength = 6;
+                //options.Password.RequireDigit = true;
+                //options.Password.RequireNonAlphanumeric = true;
+                //options.Password.RequireUppercase = true;
+                //options.Password.RequireLowercase = true;
+                //options.Password.RequiredUniqueChars = 1;
+
+                // Reduced complexity for ease of use
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireDigit = false;
+                options.Password.RequiredUniqueChars = 1;
+            })
+                .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders()
                 .AddUserStore<UserStore<ApplicationUser,ApplicationRole,ApplicationDbContext, Guid>>()
                 .AddRoleStore<RoleStore<ApplicationRole,ApplicationDbContext,Guid>>();

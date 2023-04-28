@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ContactsManager.Core.DTO
 {
-    public class RegisterDTO
+    public class RegisterRequest
     {
         [Required(ErrorMessage ="Name can't be empty")]
         public string PersonName { get; set; }

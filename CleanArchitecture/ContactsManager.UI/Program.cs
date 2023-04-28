@@ -30,9 +30,9 @@ if (builder.Environment.IsEnvironment("Test") == false)
 app.UseSerilogRequestLogging();
 app.UseHttpLogging();
 app.UseStaticFiles();
-app.UseAuthentication();
-app.UseRouting();
-app.MapControllers();
+app.UseAuthentication(); // Reading identity cookie
+app.UseRouting(); // Identifying action method based on the route
+app.MapControllers(); // Execute the filter pipeline (filters + action method itself)
 
 app.Run();
 
