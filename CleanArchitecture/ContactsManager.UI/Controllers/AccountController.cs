@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace ContactsManager.UI.Controllers
 {
     [Route("[controller]/[action]")]
-    [AllowAnonymous]
     public class AccountController : Controller
     {
         public static string ControllerName => "Account";
@@ -24,12 +23,17 @@ namespace ContactsManager.UI.Controllers
         }
 
         [HttpGet]
+        [Authorize("NotAuthenticated")]
         public async Task<IActionResult> Register()
         {
+            //if (User.Identity?.IsAuthenticated ?? false)
+            //    return RedirectToAction(nameof(PersonsController.Index), PersonsController.ControllerName);
             return View();
         }
 
         [HttpPost]
+        [Authorize("NotAuthenticated")]
+        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterRequest request, string? ReturnUrl) 
         {
             if (!ModelState.IsValid)
@@ -67,11 +71,16 @@ namespace ContactsManager.UI.Controllers
             return RedirectToAction(nameof(PersonsController.Index), PersonsController.ControllerName);
         }
         [HttpGet]
+        [Authorize("NotAuthenticated")]
         public async Task<IActionResult> Login()
         {
+            //if (User.Identity?.IsAuthenticated ?? false)
+            //    return RedirectToAction(nameof(PersonsController.Index), PersonsController.ControllerName);
             return View();
         }
         [HttpPost]
+        [Authorize("NotAuthenticated")]
+        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginRequest request, string? ReturnUrl)
         {
             ViewBag.ReturnUrl = ReturnUrl;
@@ -88,17 +97,25 @@ namespace ContactsManager.UI.Controllers
                 ViewBag.Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
                 return View(request);
             }
+            var user = await userManager.FindByEmailAsync(request.Email);
+            if(user != null)
+            {
+                if(await userManager.IsInRoleAsync(user, UserTypeOptions.Admin.ToString()))
+                    return RedirectToAction("Index", "Home", new {area = "Admin"});
+            }
             if(!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
                 return LocalRedirect(ReturnUrl);
             return RedirectToAction(nameof(PersonsController.Index), PersonsController.ControllerName);
         }
         //TODO: Seperate Get and Post and create a confirmation page
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
             return RedirectToAction(nameof(PersonsController.Index), PersonsController.ControllerName);
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> IsEmailNotRegistered(string email)
         {
             var user = await userManager.FindByEmailAsync(email);

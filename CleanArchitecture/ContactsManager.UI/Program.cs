@@ -27,6 +27,8 @@ else
 
 if (builder.Environment.IsEnvironment("Test") == false)
     Rotativa.AspNetCore.RotativaConfiguration.Setup("wwwroot", wkhtmltopdfRelativePath: "Rotativa");
+app.UseHsts();
+app.UseHttpsRedirection();
 app.UseSerilogRequestLogging();
 app.UseHttpLogging();
 app.UseStaticFiles();
@@ -38,7 +40,8 @@ app.MapControllers(); // Execute the filter pipeline (filters + action method it
 // Conventional routing is not recommended for medium to large scale applications because it is not flexible enough to handle complex routing requirements, therefore we use attribute routing
 app.UseEndpoints(endpoints => 
 {
-    endpoints.MapControllerRoute(name: "default",pattern: "{controller=Persons}/{action=Index}/{id?}");
+    endpoints.MapControllerRoute(name: "areas",pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+    endpoints.MapControllerRoute(name: "default",pattern: "{controller=Home}/{action=Index}/{id?}");
 });
 app.Run();
 

@@ -9,6 +9,7 @@ using ContactsManager.UI.Filters.ResultFilters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace ContactsManager.UI.StartupExtensions
@@ -22,6 +23,7 @@ namespace ContactsManager.UI.StartupExtensions
                 //options.Filters.Add<ResponseHeaderActionFilter>(5);
                 options.Filters.Add(new ResponseHeaderFilterFactoryAttribute("X-Custom-Key-Global", "Custom-Value-Global", 2));
                 //options.Filters.AddService<ResponseHeaderActionFilter>(2);
+                options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
             });
             //Filter Services
             //builder.Services.AddScoped<ResponseHeaderActionFilter>(provider => new ResponseHeaderActionFilter(provider.GetRequiredService<ILogger<ResponseHeaderActionFilter>>(), "X-Custom-Key-Global", "Custom-Value-Global", 2));
@@ -77,6 +79,7 @@ namespace ContactsManager.UI.StartupExtensions
             services.AddAuthorization(options =>
             {
                 options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build(); // enforces authorization policy on all controllers and actions
+                options.AddPolicy("NotAuthenticated", policy => policy.RequireAssertion(context => !(context.User.Identity.IsAuthenticated)));
             });
 
             services.ConfigureApplicationCookie(options =>
