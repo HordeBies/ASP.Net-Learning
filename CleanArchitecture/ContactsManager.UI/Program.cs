@@ -35,6 +35,11 @@ app.UseAuthentication(); // Reading identity cookie
 app.UseAuthorization(); // Validates access permissions of the user
 app.MapControllers(); // Execute the filter pipeline (filters + action method itself)
 
+// Conventional routing is not recommended for medium to large scale applications because it is not flexible enough to handle complex routing requirements, therefore we use attribute routing
+app.UseEndpoints(endpoints => 
+{
+    endpoints.MapControllerRoute(name: "default",pattern: "{controller=Persons}/{action=Index}/{id?}");
+});
 app.Run();
 
 public partial class Program { }

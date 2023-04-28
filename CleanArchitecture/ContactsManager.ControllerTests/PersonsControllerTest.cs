@@ -63,10 +63,10 @@ namespace ContactsManager.ControllerTests
             PersonsController controller = new(countriesService, logger);
 
             personsGetterServiceMock.Setup(r => r.GetFilteredPersons(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(personResponses);
-            personsSorterServiceMock.Setup(r => r.GetSortedPersons(It.IsAny<List<PersonResponse>>(), It.IsAny<string>(), It.IsAny<SortOrder>())).ReturnsAsync(personResponses);
+            personsSorterServiceMock.Setup(r => r.GetSortedPersons(It.IsAny<List<PersonResponse>>(), It.IsAny<string>(), It.IsAny<SortOrderOptions>())).ReturnsAsync(personResponses);
 
             //Act
-            var result = await controller.Index(personsGetterService, personsSorterService, fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<SortOrder>());
+            var result = await controller.Index(personsGetterService, personsSorterService, fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<SortOrderOptions>());
 
             //Assert
             var viewResult = Assert.IsType<ViewResult>(result);

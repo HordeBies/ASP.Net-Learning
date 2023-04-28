@@ -35,7 +35,7 @@ namespace ContactsManager.UI.Controllers
         [ResponseHeaderFilterFactory("X-Custom-Key-Action", "Custom-Value-Action", 1)]
         [ServiceFilter(typeof(PersonsListResultFilter))]
         [SkipFilter]
-        public async Task<IActionResult> Index([FromServices] IPersonsGetterService personsGetterService, [FromServices] IPersonsSorterService personsSorterService, string searchBy, string? searchString, string sortBy = nameof(PersonResponse.PersonName), SortOrder sortOrder = SortOrder.Ascending)
+        public async Task<IActionResult> Index([FromServices] IPersonsGetterService personsGetterService, [FromServices] IPersonsSorterService personsSorterService, string searchBy, string? searchString, string sortBy = nameof(PersonResponse.PersonName), SortOrderOptions sortOrder = SortOrderOptions.Ascending)
         {
             logger.LogInformation("Index action method is called");
             logger.LogDebug($"searchBy: {searchBy}, searchString: {searchString}, sortBy: {sortBy}, sortOrder: {sortOrder}");

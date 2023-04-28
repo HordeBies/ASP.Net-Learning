@@ -221,7 +221,7 @@ namespace ContactsManager.ServiceTests
             personsRepositoryMock.Setup(r => r.GetAllPersons()).ReturnsAsync(personList);
             var expected = personList.Select(p => p.ToPersonResponse()).ToList();
 
-            var actual = await personsSorterService.GetSortedPersons(await personsGetterService.GetAllPersons(), nameof(PersonResponse.PersonName), SortOrder.Descending);
+            var actual = await personsSorterService.GetSortedPersons(await personsGetterService.GetAllPersons(), nameof(PersonResponse.PersonName), SortOrderOptions.Descending);
 
             var comparer = CultureInfo.InvariantCulture.CompareInfo.GetStringComparer(CompareOptions.IgnoreCase);
             actual.Should().BeInDescendingOrder(expected => expected.PersonName, comparer: comparer);

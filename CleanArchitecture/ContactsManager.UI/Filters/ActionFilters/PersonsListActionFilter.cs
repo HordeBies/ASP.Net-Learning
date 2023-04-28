@@ -54,7 +54,7 @@ namespace ContactsManager.UI.Filters.ActionFilters
                 if (args.TryGetValue("sortOrder", out value))
                     controller.ViewData["sortOrder"] = value?.ToString();
                 else
-                    controller.ViewData["sortOrder"] = SortOrder.Ascending.ToString();
+                    controller.ViewData["sortOrder"] = SortOrderOptions.Ascending.ToString();
             }
             controller.ViewBag.SearchFields = new Dictionary<string, string>()
             {

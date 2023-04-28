@@ -1,7 +1,7 @@
 ﻿
 namespace ContactsManager.Core.Enums
 {
-    public enum SortOrder
+    public enum SortOrderOptions
     {
         Ascending,
         Descending,

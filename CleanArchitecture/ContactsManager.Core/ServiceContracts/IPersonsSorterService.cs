@@ -14,7 +14,7 @@ namespace ContactsManager.Core.ServiceContracts
         /// <param name="sortby">The name of the property to sort by.</param>
         /// <param name="sortOrder">The sort order to use (ascending or descending).</param>
         /// <returns>A sorted list of person objects.</returns>
-        Task<List<PersonResponse>> GetSortedPersons(List<PersonResponse> collectiong, string sortby, Enums.SortOrder sortOrder);
+        Task<List<PersonResponse>> GetSortedPersons(List<PersonResponse> collectiong, string sortby, Enums.SortOrderOptions sortOrder);
 
     }
 }

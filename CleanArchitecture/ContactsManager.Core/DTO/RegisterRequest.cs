@@ -1,12 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using ContactsManager.Core.Enums;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace ContactsManager.Core.DTO
 {
@@ -30,5 +24,6 @@ namespace ContactsManager.Core.DTO
         [Compare(nameof(Password),ErrorMessage ="Passwords don't match")]
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
+        public UserTypeOptions UserType { get; set; } = UserTypeOptions.User;
     }
 }

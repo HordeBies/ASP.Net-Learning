@@ -1,7 +1,7 @@
-﻿@if (ViewBag.sortBy == ViewBag.columnName && ViewBag.sortOrder == nameof(SortOrder.Ascending))
+﻿@if (ViewBag.sortBy == ViewBag.columnName && ViewBag.sortOrder == nameof(SortOrderOptions.Ascending))
 {
     <th>
-        <a href="~/persons/index?searchBy=@(ViewBag.searchBy)&searchString=@(ViewBag.searchString)&sortBy=@(ViewBag.columnName)&sortOrder=@(nameof(SortOrder.Descending))">
+        <a href="~/persons/index?searchBy=@(ViewBag.searchBy)&searchString=@(ViewBag.searchString)&sortBy=@(ViewBag.columnName)&sortOrder=@(nameof(SortOrderOptions.Descending))">
             @(ViewBag.displayName)
             <i class="fa-solid fa-sort-up"></i>
         </a>
@@ -10,7 +10,7 @@
 else
 {
     <th>
-        <a href="~/persons/index?searchBy=@(ViewBag.searchBy)&searchString=@(ViewBag.searchString)&sortBy=@(ViewBag.columnName)&sortOrder=@(nameof(SortOrder.Ascending))">
+        <a href="~/persons/index?searchBy=@(ViewBag.searchBy)&searchString=@(ViewBag.searchString)&sortBy=@(ViewBag.columnName)&sortOrder=@(nameof(SortOrderOptions.Ascending))">
             @(ViewBag.displayName)
             @if (ViewBag.sortBy == ViewBag.columnName)
             {

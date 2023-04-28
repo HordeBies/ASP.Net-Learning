@@ -1,5 +1,6 @@
 ﻿using ContactsManager.Core.Domain.IdentityEntities;
 using ContactsManager.Core.DTO;
+using ContactsManager.Core.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +15,12 @@ namespace ContactsManager.UI.Controllers
 
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        private readonly RoleManager<ApplicationRole> roleManager;
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<ApplicationRole> roleManager)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.roleManager = roleManager;
         }
 
         [HttpGet]
@@ -51,6 +54,10 @@ namespace ContactsManager.UI.Controllers
                 ViewBag.Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
                 return View(request);
             }
+            // Role Assignment
+            if (!await roleManager.RoleExistsAsync(request.UserType.ToString()))
+                await roleManager.CreateAsync(new ApplicationRole { Name = request.UserType.ToString() });
+            await userManager.AddToRoleAsync(user, request.UserType.ToString());
 
             //Sign-In
             //TODO: Instead, redirect to Sign-In page to get isPersistent(Keep me signed in [x]) from user
