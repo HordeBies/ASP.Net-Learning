@@ -6,6 +6,7 @@ using ContactsManager.Infrastructure.DbContexts;
 using ContactsManager.Infrastructure.Repositories;
 using ContactsManager.UI.Filters.ActionFilters;
 using ContactsManager.UI.Filters.ResultFilters;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -72,6 +73,17 @@ namespace ContactsManager.UI.StartupExtensions
                 .AddDefaultTokenProviders()
                 .AddUserStore<UserStore<ApplicationUser,ApplicationRole,ApplicationDbContext, Guid>>()
                 .AddRoleStore<RoleStore<ApplicationRole,ApplicationDbContext,Guid>>();
+
+            services.AddAuthorization(options =>
+            {
+                options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build(); // enforces authorization policy on all controllers and actions
+            });
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";
+                options.AccessDeniedPath = "/Account/AccessDenied"; // TODO: Create this page
+            });
 
             services.AddHttpLogging(options =>
             {

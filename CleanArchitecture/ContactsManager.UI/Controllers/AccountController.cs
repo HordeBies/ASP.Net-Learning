@@ -1,13 +1,17 @@
 ﻿using ContactsManager.Core.Domain.IdentityEntities;
 using ContactsManager.Core.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContactsManager.UI.Controllers
 {
     [Route("[controller]/[action]")]
+    [AllowAnonymous]
     public class AccountController : Controller
     {
+        public static string ControllerName => "Account";
+
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
         public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
@@ -23,7 +27,7 @@ namespace ContactsManager.UI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterRequest request) 
+        public async Task<IActionResult> Register(RegisterRequest request, string? ReturnUrl) 
         {
             if (!ModelState.IsValid)
             {
@@ -51,6 +55,8 @@ namespace ContactsManager.UI.Controllers
             //Sign-In
             //TODO: Instead, redirect to Sign-In page to get isPersistent(Keep me signed in [x]) from user
             await signInManager.SignInAsync(user, isPersistent: false);
+            if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+                return LocalRedirect(ReturnUrl);
             return RedirectToAction(nameof(PersonsController.Index), PersonsController.ControllerName);
         }
         [HttpGet]
@@ -59,8 +65,9 @@ namespace ContactsManager.UI.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> Login(LoginRequest request)
+        public async Task<IActionResult> Login(LoginRequest request, string? ReturnUrl)
         {
+            ViewBag.ReturnUrl = ReturnUrl;
             if (!ModelState.IsValid)
             {
                 ViewBag.Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
@@ -74,7 +81,8 @@ namespace ContactsManager.UI.Controllers
                 ViewBag.Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
                 return View(request);
             }
-
+            if(!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+                return LocalRedirect(ReturnUrl);
             return RedirectToAction(nameof(PersonsController.Index), PersonsController.ControllerName);
         }
         //TODO: Seperate Get and Post and create a confirmation page
@@ -82,6 +90,14 @@ namespace ContactsManager.UI.Controllers
         {
             await signInManager.SignOutAsync();
             return RedirectToAction(nameof(PersonsController.Index), PersonsController.ControllerName);
+        }
+
+        public async Task<IActionResult> IsEmailNotRegistered(string email)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            if(user != null)
+                return Json($"Email {email} is already registered.");
+            return Json(true); 
         }
     }
 }

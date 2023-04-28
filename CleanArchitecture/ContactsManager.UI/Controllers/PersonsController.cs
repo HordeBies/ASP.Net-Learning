@@ -18,7 +18,7 @@ namespace ContactsManager.UI.Controllers
     [TypeFilter(typeof(PersonAlwaysRunResultFilter))]
     public class PersonsController : Controller
     {
-        public static string ControllerName => nameof(PersonsController).Replace("Controller", string.Empty);
+        public static string ControllerName => "Persons";//nameof(PersonsController).Replace("Controller", string.Empty);
 
         private readonly ICountriesService countriesService;
         private readonly ILogger<PersonsController> logger;
