@@ -34,7 +34,7 @@ Here is a list of the projects/topics included in the solution:
   - ServiceContracts
   - RepositoryContracts
   - Services
-- ### Clean Architecture
+- ### Clean Architecture, Identity, Authorization, Security
   - #### Structure
     - ContactsManager.Core
     - ContactsManager.UI
@@ -43,5 +43,10 @@ Here is a list of the projects/topics included in the solution:
     - ContactsManager.ControllerTests
     - ContactsManager.ServiceTests
     - ContactsManager.IntegrationTests
+- ### Web API
+  - #### Structure
+	- CitiesManager.Core
+	- CitiesManager.Infrastructure
+	- CitiesManager.WebAPI
 
 Feel free to explore each project to learn more about the specific topics covered in the bootcamp.
