@@ -1,11 +1,8 @@
-﻿using ContactsManager.Core.Domain.Entities;
+﻿using CitiesManager.Core.Domain.Entities;
 
-namespace ContactsManager.Core.Domain.RepositoryContracts
+namespace CitiesManager.Core.Domain.RepositoryContracts
 {
-    /// <summary>
-    /// Represents data access logic for managing Country entity.
-    /// </summary>
-    public interface ICountriesRepository
+    public interface ICitiesRepository
     {
         /// <summary>
         /// Adds a new city to the data store.
@@ -29,12 +26,23 @@ namespace ContactsManager.Core.Domain.RepositoryContracts
         Task<City?> GetCity(string cityName);
 
         /// <summary>
+        /// Updates an existing city in the data store.
+        /// </summary>
+        /// <param name="city">The city to update.</param>
+        /// <returns>The updated city information.</returns>
+        Task<City> UpdateCity(City city);
+
+        /// <summary>
+        /// Deletes an existing city from the data store.
+        /// </summary>
+        /// <param name="cityID">The ID of the city to delete.</param>
+        /// <returns>True if the city was deleted, false if it was not found.</returns>
+        Task<bool> DeleteCity(Guid cityID);
+
+        /// <summary>
         /// Retrieves all cities from the data store.
         /// </summary>
         /// <returns>A list of all cities in the data store.</returns>
         Task<List<City>> GetAllCities();
-
-
     }
-
 }

@@ -21,5 +21,14 @@ namespace CitiesManager.Infrastructure.DbContexts
                 new City { CityID = Guid.Parse("6BD9F2A9-3F22-47CB-999D-FDD1AB7790AA"), CityName = "Tokyo" },
                 new City { CityID = Guid.Parse("9364A092-AAD7-48DC-9A71-4A4CF6E02211"), CityName = "Hong Kong" });
         }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=FirstBootCamp_CitiesDatabase;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
+            }
+        }
+
     }
 }
