@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CitiesManager.WebAPI</name>
+    </assembly>
+    <members>
+        <member name="T:CitiesManager.WebAPI.Controllers.ApiControllerBase">
+            <summary>
+            Represents a base controller for handling API requests.
+            </summary>
+        </member>
+        <member name="T:CitiesManager.WebAPI.Controllers.v1.CitiesController">
+            <summary>
+            Represents a controller for handling city-related API requests.
+            </summary>
+        </member>
+        <member name="M:CitiesManager.WebAPI.Controllers.v1.CitiesController.#ctor(CitiesManager.Core.ServiceContracts.ICitiesService)">
+            <summary>
+            Initializes a new instance of the <see cref="T:CitiesManager.WebAPI.Controllers.v1.CitiesController"/> class.
+            </summary>
+            <param name="citiesService">The service used for handling city-related data.</param>
+        </member>
+        <member name="M:CitiesManager.WebAPI.Controllers.v1.CitiesController.GetCities">
+            <summary>
+            Retrieves all cities.
+            </summary>
+            <returns>An action result containing a list of city responses.</returns>
+        </member>
+        <member name="M:CitiesManager.WebAPI.Controllers.v1.CitiesController.GetCity(System.Guid)">
+            <summary>
+            Retrieves a city by ID.
+            </summary>
+            <param name="id">The ID of the city to retrieve.</param>
+            <returns>An action result containing the city response if found, otherwise returns an error response.</returns>
+        </member>
+        <member name="M:CitiesManager.WebAPI.Controllers.v1.CitiesController.PutCity(System.Guid,CitiesManager.Core.DTO.CityRequest)">
+            <summary>
+            Updates an existing city.
+            </summary>
+            <param name="id">The ID of the city to update.</param>
+            <param name="city">The city data to update with.</param>
+            <returns>An action result containing the updated city response if successful, otherwise returns an error response.</returns>
+        </member>
+        <member name="M:CitiesManager.WebAPI.Controllers.v1.CitiesController.PostCity(CitiesManager.Core.DTO.CityRequest)">
+            <summary>
+            Adds a new city.
+            </summary>
+            <param name="city">The city data to add.</param>
+            <returns>An action result containing the created city response.</returns>
+        </member>
+        <member name="M:CitiesManager.WebAPI.Controllers.v1.CitiesController.DeleteCity(System.Guid)">
+            <summary>
+            Deletes a city by ID.
+            </summary>
+            <param name="id">The ID of the city to delete.</param>
+            <returns>An action result indicating success if the city was deleted, otherwise returns an error response.</returns>
+        </member>
+        <member name="T:CitiesManager.WebAPI.Controllers.v2.CitiesController">
+            <summary>
+            Represents a controller for handling city-related API requests.
+            </summary>
+        </member>
+        <member name="M:CitiesManager.WebAPI.Controllers.v2.CitiesController.#ctor(CitiesManager.Core.ServiceContracts.ICitiesService)">
+            <summary>
+            Initializes a new instance of the <see cref="T:CitiesManager.WebAPI.Controllers.v2.CitiesController"/> class.
+            </summary>
+            <param name="citiesService">The service used for handling city-related data.</param>
+        </member>
+        <member name="M:CitiesManager.WebAPI.Controllers.v2.CitiesController.GetCities">
+            <summary>
+            Retrieves all cities.
+            </summary>
+            <returns>An action result containing a list of city responses.</returns>
+        </member>
+    </members>
+</doc>
